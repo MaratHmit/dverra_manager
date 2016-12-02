@@ -67,7 +67,7 @@ products
             {title: 'Группы параметров', name: 'parameters-groups', link: 'parameters-groups'},
             {title: 'Параметры', name: 'parameters', link: 'parameters'},
             {title: 'Скидки', name: 'discounts', link: 'discounts'},
-            {title: 'Купоны', name: 'coupons', link: 'coupons'},
+            //{title: 'Купоны', name: 'coupons', link: 'coupons'},
         ]
 
         var route = riot.route.create()

@@ -1,6 +1,7 @@
 | import 'pages/warehouse/units/units-list.tag'
 | import 'pages/warehouse/units/unit-edit.tag'
 | import 'pages/warehouse/warehouses/warehouses-list.tag'
+| import 'pages/warehouse/warehouses/warehouse-edit.tag'
 | import 'pages/warehouse/groups/groups-list.tag'
 
 warehouse
@@ -14,6 +15,7 @@ warehouse
         unit-edit(if='{ tab == "units" && edit }')
         groups-units-list(if='{ tab == "groups" && !edit }')
         warehouses-list(if='{ tab == "warehouses" && !edit }')
+        warehouse-edit(if='{ tab == "warehouses" && edit }')
 
     script(type='text/babel').
         var self = this
@@ -34,6 +36,11 @@ warehouse
             observable.trigger('unit-new', id)
             self.edit = true
             self.update()
+        })
+
+        route('/products/warehouses/new', tab => {
+            self.update({edit: true, tab: 'warehouses'})
+            observable.trigger('warehouse-new')
         })
 
         route('/warehouse/([0-9]+)', id => {
