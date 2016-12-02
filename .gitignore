@@ -1,0 +1,6 @@
+.idea
+node_modules
+build/bundle.js
+build/bundle.js.map
+build/files
+build/index.html

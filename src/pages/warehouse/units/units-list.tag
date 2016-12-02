@@ -1,0 +1,56 @@
+| import 'components/catalog.tag'
+
+units-list
+    .row
+        .col-md-2.hidden-xs.hidden-sm
+            catalog-tree(object='UnitGroup', label-field='{ "name" }', children-field='{ "childs" }',
+                reload='true', descendants='true')
+        .col-md-10.col-xs-12.col-sm-12
+            catalog(search='true', sortable='true', object='Unit', cols='{ cols }', reload='true', store='units-list',
+                filters='{ categoryFilters }',
+                add='{ add }', dblclick='{ edit }', remove='{ remove }')
+                #{'yield'}(to='body')
+                    datatable-cell(name='id') { row.id }
+                    datatable-cell(name='code') { row.code }
+                    datatable-cell(name='name') { row.name }
+                    datatable-cell(name='price')
+                        span { (row.price / 1).toLocaleString() } ₽
+                    datatable-cell(name='count') { (row.count / 1) }
+
+    script(type='text/babel').
+        var self = this
+
+        self.mixin('permissions')
+        self.mixin('remove')
+        self.collection = 'Unit'
+
+        self.cols = [
+            {name: 'id', value: '#'},
+            {name: 'code', value: 'Код' },
+            {name: 'name', value: 'Наименование' },
+            {name: 'price', value: 'Цена' },
+            {name: 'count', value: 'Остаток' },
+        ]
+
+        self.add = () => riot.route('/warehouse/new')
+
+        self.edit = e => riot.route(`/warehouse/${e.item.row.id}`)
+
+        self.one('updated', () => {
+            self.tags['catalog-tree'].tags.treeview.on('nodeselect', node => {
+                self.selectedCategory = node.__selected__ ? node.id : undefined
+                let items = self.tags['catalog-tree'].tags.treeview.getSelectedNodes()
+                if (items.length > 0) {
+                    let value = items.map(i => i.id).join(',')
+                    self.categoryFilters = [{field: 'idGroup', sign: 'IN', value}]
+                } else {
+                    self.categoryFilters = false
+                }
+                self.update()
+                self.tags.catalog.reload()
+            })
+        })
+
+        observable.on('units-reload', () => {
+            self.tags.catalog.reload()
+        })
