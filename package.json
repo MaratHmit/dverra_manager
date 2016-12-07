@@ -1,7 +1,7 @@
 {
-  "name": "shop24",
+  "name": "dverra",
   "version": "0.0.1",
-  "description": "EDGESTILE Shop24",
+  "description": "dveRRa manager",
   "main": "webpack.config.js",
   "scripts": {
     "build": "webpack --config webpack-production.config.js -p --progress --colors",

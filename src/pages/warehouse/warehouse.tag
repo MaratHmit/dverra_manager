@@ -3,6 +3,7 @@
 | import 'pages/warehouse/warehouses/warehouses-list.tag'
 | import 'pages/warehouse/warehouses/warehouse-edit.tag'
 | import 'pages/warehouse/groups/groups-list.tag'
+| import 'pages/warehouse/groups/group-unit-edit.tag'
 
 warehouse
     ul(if='{ !edit }').nav.nav-tabs.m-b-2
@@ -14,6 +15,7 @@ warehouse
         units-list(if='{ tab == "units" && !edit }')
         unit-edit(if='{ tab == "units" && edit }')
         groups-units-list(if='{ tab == "groups" && !edit }')
+        group-unit-edit(if='{ tab == "groups" && edit }')
         warehouses-list(if='{ tab == "warehouses" && !edit }')
         warehouse-edit(if='{ tab == "warehouses" && edit }')
 

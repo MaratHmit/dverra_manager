@@ -85,7 +85,6 @@ product-edit-modifications-add-modal
                 .form-group(each='{ param, i in features }', class='{ has-error: parent.error[item.id] }')
                     label.control-label { param.name }
                     select.form-control(name='{ param.idFeature }', value='{ param.value }', onchange='{ changeFeature }')
-                        option(if='{ !handlers.isExist(param.idFeature) }', value='') Выберите значение
                         option(each='{ values, i in param.values }', value='{ values.id }',
                             selected='{ handlers.isSelected(param.idFeature, values.id) }') { values.value }
                     .help-block { parent.error[param.id] }
@@ -144,6 +143,20 @@ product-edit-modifications-add-modal
                 data: {id: opts.idType},
                 success(response) {
                     modal.features = response.features.filter(i => i.target == 1)
+
+                    if (!modal.item.params.length) {
+                        modal.features.forEach(feature => {
+                            if (feature.values.length) {
+                                modal.item.params.push({
+                                    idFeature: feature.id,
+                                    name: feature.name,
+                                    idValue: feature.values[0].id,
+                                    value: feature.values[0].value,
+                                })
+                            }
+                        })
+                    }
+
                     modal.features = modal.features.map(item => {
                         let newItem = {
                             idFeature: item.id,
@@ -203,17 +216,6 @@ product-edit-modifications-add-modal
                 return param.length ? true : false
             }
 
-            var isExist = (idFeature) => {
-                if (modal.item.params == undefined)
-                    return false
-
-                let params = modal.item.params.filter(i => (i.idFeature == idFeature))
-                return params.length ? true : false
-            }
-
-            modal.handlers = {
-                isSelected: isSelected,
-                isExist: isExist
-            }
+            modal.handlers = { isSelected: isSelected }
 
         })

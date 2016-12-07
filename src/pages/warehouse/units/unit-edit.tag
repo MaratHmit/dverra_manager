@@ -14,16 +14,11 @@ unit-edit
 
         form(action='', onchange='{ change }', onkeyup='{ change }', method='POST')
             .row
-                .col-md-2
+                .col-md-4
                     .form-group
                         label.control-label Код товара
                         input.form-control(name='code', type='text', value='{ item.code }')
-                .col-md-4
-                    .form-group(class='{ has-error: error.name }')
-                        label.control-label Наименование
-                        input.form-control(name='name', type='text', value='{ item.name }')
-                        .help-block { error.name }
-                .col-md-6
+                .col-md-8
                     .form-group
                         label.control-label Группа
                         .input-group
@@ -31,18 +26,39 @@ unit-edit
                             span.input-group-addon(onclick='{ changeGroup }')
                                 i.fa.fa-list
             .row
-                .col-md-2
+                .col-md-12
+                    .form-group(class='{ has-error: error.name }')
+                        label.control-label Наименование
+                        input.form-control(name='name', type='text', value='{ item.name }')
+                        .help-block { error.name }
+            .row
+                .col-md-4
                     .form-group
-                        label.control-label Цена закуп.
-                        input.form-control(name='pricePurchase', type='number', min='0', step='1', value='{ parseFloat(item.pricePurchase) }')
-                .col-md-2
+                        label.control-label Розничная цена
+                        input.form-control(name='price', type='number', value='{ item.price }')
+            .row
+                .col-md-4
                     .form-group
-                        label.control-label Цена реализ.
-                        input.form-control(name='price', type='number', min='0', step='1', value='{ parseFloat(item.price) }')
-                .col-md-2
-                    .form-group
-                        label.control-label Кол-во
-                        input.form-control(name='count', type='number', min='0', step='1', value='{ parseFloat(item.count) }')
+                        label.control-label Закупочные цены и остатки
+                        .table-responsive
+                            table.table.table-bordered
+                                thead
+                                    tr
+                                        th Цена
+                                        th Остаток
+                                        th
+                                            button.btn.btn-default(onclick='{ addStockPrice }')
+                                                i.fa.fa-plus.text-success
+                                tbody
+                                    tr(each='{ value, i in item.stockPrices }')
+                                        td
+                                            input.form-control(name='price_{ i }', type='number', value='{ value.price }', onchange='{ changePrice }')
+                                        td
+                                            input.form-control(name='count_{ i }', type='number', value='{ value.count }', onchange='{ changePrice }')
+                                        td
+                                            button.btn.btn-default(onclick='{ delStockPrice }')
+                                                i.fa.fa-trash.text-danger
+
 
     script(type='text/babel').
         var self = this
@@ -104,6 +120,25 @@ unit-edit
             })
         }
 
+        self.addStockPrice = () => {
+            self.item.stockPrices.push({
+                price: 0,
+                count: 0
+            })
+            self.update()
+        }
+
+        self.delStockPrice = (e) => {
+            self.item.stockPrices = self.item.stockPrices.filter(item => (item != e.item.value))
+            self.update()
+        }
+
+        self.changePrice = (e) => {
+            let name = e.target.name
+            let [field, index] = name.split("_")
+            self.item.stockPrices[index][field] = e.target.value
+        }
+
         observable.on('unit-new', () => {
             self.error = false
             self.isNew = true
@@ -142,3 +177,4 @@ unit-edit
         self.on('mount', () => {
             riot.route.exec()
         })
+

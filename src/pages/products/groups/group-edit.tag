@@ -209,8 +209,8 @@ group-edit
 
 
         self.removeGroup = e => {
-            self.item.upid = null
-            self.item.nameParent = ''
+            self.item.idParent = null
+            self.item.nameParent = null
         }
 
         observable.on('categories-edit', id => {
