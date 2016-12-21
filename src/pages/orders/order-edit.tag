@@ -318,7 +318,6 @@ order-edit
             self.error = self.validation.validate(self.item, self.rules())
 
             if (!self.error) {
-                console.log("ok")
                 API.request({
                     object: 'Order',
                     method: 'Save',

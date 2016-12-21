@@ -11,6 +11,8 @@
 | import 'pages/products/discounts/discount-edit.tag'
 | import 'pages/products/coupons/coupons-list.tag'
 | import 'pages/products/coupons/coupon-edit.tag'
+| import 'pages/products/shop-services/shop-services.tag'
+| import 'pages/products/shop-services/shop-service-edit.tag'
 | import 'pages/products/products-types/products-types-list.tag'
 | import 'pages/products/labels/labels-list.tag'
 | import 'pages/products/labels/label-edit.tag'
@@ -49,6 +51,9 @@ products
         discounts-list(if='{ tab == "discounts" && !edit }')
         discount-edit(if='{ tab == "discounts" && edit }')
 
+        shop-services(if='{ tab == "shop-services" && !edit }')
+        shop-service-edit(if='{ tab == "shop-services" && edit }')
+
         coupons-list(if='{ tab == "coupons" && !edit }')
         coupon-edit(if='{ tab == "coupons" && edit }')
 
@@ -59,15 +64,16 @@ products
         self.tab = ''
 
         self.tabs = [
-            {title: 'Список товаров', name: 'products', link: ''},
-            {title: 'Категории', name: 'categories', link: 'categories'},
+            {title: 'Товары', name: 'products', link: ''},
+            {title: 'Каталог', name: 'categories', link: 'categories'},
+            {title: 'Услуги', name: 'shop-services', link: 'shop-services'},
             {title: 'Ярлыки', name: 'labels', link: 'labels'},
             {title: 'Типы товаров', name: 'types', link: 'types'},
             {title: 'Бренды', name: 'brands', link: 'brands'},
             {title: 'Группы параметров', name: 'parameters-groups', link: 'parameters-groups'},
             {title: 'Параметры', name: 'parameters', link: 'parameters'},
             {title: 'Скидки', name: 'discounts', link: 'discounts'},
-            //{title: 'Купоны', name: 'coupons', link: 'coupons'},
+            {title: 'Купоны', name: 'coupons', link: 'coupons'},
         ]
 
         var route = riot.route.create()
@@ -134,6 +140,11 @@ products
         route('/products/labels/new', tab => {
             self.update({edit: true, tab: 'labels'})
             observable.trigger('label-new')
+        })
+
+        route('/products/shop-services/new', tab => {
+            self.update({edit: true, tab: 'shop-services'})
+            observable.trigger('shop-service-new')
         })
 
         route('/products', () => {

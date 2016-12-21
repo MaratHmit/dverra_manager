@@ -11,6 +11,8 @@
 | import 'pages/settings/settings.tag'
 | import 'pages/payments/payments.tag'
 | import 'pages/analytics/analytics.tag'
+| import 'pages/requests/requests.tag'
+| import 'pages/schedule/schedule.tag'
 | import 'pages/import/import.tag'
 | import 'pages/not-found.tag'
 | import 'modals/account-add-modal.tag'
@@ -69,7 +71,9 @@ app
             .main.col-md-12(style='width: 100%;')
                 desktop(if='{ tab == "desktop" }')
                     h4 Рабочий стол - в разработке
+                requests(if='{ tab == "requests" }')
                 orders(if='{ tab == "orders" }')
+                schedule(if='{ tab == "schedule" }')
                 products(if='{ tab == "products" }')
                 warehouse(if='{ tab == "warehouse" }')
                 payments(if='{ tab == "payments" }')
@@ -140,7 +144,9 @@ app
         self.unsupported = app.checkUnsupported()
 
         self.sidebar = [
+            {title: 'Заявки', name: 'requests', link: 'requests', permission: 'orders', icon: 'fa-tasks'},
             {title: 'Заказы', name: 'orders', link: 'orders', permission: 'orders', icon: 'fa-shopping-cart'},
+            {title: 'График услуг', name: 'schedule', link: 'schedule', permission: 'orders', icon: 'fa-calendar'},
             {title: 'Витрина', name: 'products', link: 'products', permission: 'products', icon: 'fa-shopping-bag'},
             {title: 'Склад', name: 'warehouse', link: 'warehouse', permission: 'products', icon: 'fa-building-o'},
         //{title: 'Платежи', name: 'payments', link: 'payments', permission: 'payments', icon: 'fa-money'},

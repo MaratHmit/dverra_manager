@@ -182,6 +182,7 @@ datatable
                 doubleClick(e)
             }
 
+
             if (!e.shiftKey) {
                 if (!e.ctrlKey && !e.metaKey)
                     selectOneRow(e)

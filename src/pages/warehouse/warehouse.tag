@@ -4,6 +4,7 @@
 | import 'pages/warehouse/warehouses/warehouse-edit.tag'
 | import 'pages/warehouse/groups/groups-list.tag'
 | import 'pages/warehouse/groups/group-unit-edit.tag'
+| import 'pages/warehouse/supply/supply-list.tag'
 
 warehouse
     ul(if='{ !edit }').nav.nav-tabs.m-b-2
@@ -18,6 +19,7 @@ warehouse
         group-unit-edit(if='{ tab == "groups" && edit }')
         warehouses-list(if='{ tab == "warehouses" && !edit }')
         warehouse-edit(if='{ tab == "warehouses" && edit }')
+        supply-list(if='{ tab == "supply" && !edit }')
 
     script(type='text/babel').
         var self = this
@@ -29,6 +31,7 @@ warehouse
             {title: 'Товары', name: 'units', link: ''},
             {title: 'Группы', name: 'groups', link: 'groups'},
             {title: 'Склады', name: 'warehouses', link: 'warehouses'},
+            {title: 'Поставки', name: 'supply', link: 'supply'},
         ]
 
         var route = riot.route.create()

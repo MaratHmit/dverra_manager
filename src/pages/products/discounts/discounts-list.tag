@@ -5,13 +5,13 @@ discounts-list
     dblclick='{ permission(open, "products", "1000") }')
         #{'yield'}(to='body')
             datatable-cell(name='id') { row.id }
-            datatable-cell(name='title') { row.title }
+            datatable-cell(name='name') { row.name }
             datatable-cell(name='dateFrom') { row.dateFrom }
             datatable-cell(name='dateTo') { row.dateTo }
             datatable-cell(name='stepTime') { row.stepTime }ч.
             datatable-cell(name='stepDiscount') { row.stepDiscount }
-            datatable-cell(name='summFrom') { row.summFrom }
-            datatable-cell(name='summTo') { row.summTo }
+            datatable-cell(name='summFrom') { row.sumFrom }
+            datatable-cell(name='summTo') { row.sumTo }
             datatable-cell(name='countFrom') { row.countFrom }
             datatable-cell(name='countTo') { row.countTo }
             datatable-cell(name='week') { handlers.getListOfDays(row.week) }
@@ -25,13 +25,13 @@ discounts-list
 
         self.cols = [
             {name: 'id', value: '#'},
-            {name: 'title', value: 'Наименование'},
+            {name: 'name', value: 'Наименование'},
             {name: 'dateFrom', value: 'Старт'},
             {name: 'dateTo', value: 'Завершение'},
             {name: 'stepTime', value: 'Шаг времени'},
             {name: 'stepDiscount', value: 'Шаг скидки'},
-            {name: 'summFrom', value: 'От суммы'},
-            {name: 'summTo', value: 'До суммы'},
+            {name: 'sumFrom', value: 'От суммы'},
+            {name: 'sumTo', value: 'До суммы'},
             {name: 'countFrom', value: 'От кол-ва'},
             {name: 'countTo', value: 'До кол-ва'},
             {name: 'week', value: 'Дни недели'},
