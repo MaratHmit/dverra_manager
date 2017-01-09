@@ -9,7 +9,7 @@ persons-list
     dblclick='{ permission(personOpen, "contacts", "1000") }', store='persons-list')
         #{'yield'}(to='body')
             datatable-cell(name='id') { row.id }
-            datatable-cell(name='createdAt') { row.createdAt }
+            datatable-cell(name='regDate') { row.regDate }
             datatable-cell(name='name') { row.name }
             datatable-cell(name='login') { row.login }
             datatable-cell(name='email') { row.email }
@@ -35,7 +35,7 @@ persons-list
 
         self.cols = [
             {name: 'id', value: '#'},
-            {name: 'createdAt', value: 'Время рег.'},
+            {name: 'regDate', value: 'Дата рег.'},
             {name: 'name', value: 'Название'},
             {name: 'login', value: 'Логин'},
             {name: 'email', value: 'Email'},

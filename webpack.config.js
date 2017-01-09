@@ -38,7 +38,10 @@ module.exports = {
         })
     ],
     resolve: {
-        root: path.resolve('src')
+        root: path.resolve('src'),
+        alias: {
+            'inputmask' : path.resolve('node_modules/jquery-inputmask/index')
+        }
     },
     module: {
         preLoaders: [

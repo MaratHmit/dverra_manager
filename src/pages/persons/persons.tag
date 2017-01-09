@@ -37,6 +37,7 @@ persons
             observable.trigger('persons-edit', id)
             self.edit = true
             self.update()
+            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
         })
 
         route('/persons/*', tab => {

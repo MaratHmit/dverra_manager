@@ -24,7 +24,8 @@
     "moment": "^2.15.0",
     "riot": "3.0.0-alpha.2",
     "riot-route": "^2.4.0",
-    "sortablejs": "^1.4.2"
+    "sortablejs": "^1.4.2",
+    "jquery-inputmask": "1.0.1"
   },
   "author": "",
   "license": "ISC",

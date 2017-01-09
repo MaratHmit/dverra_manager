@@ -1,6 +1,6 @@
 
 schedule
-    .well.well-sm
+    .well.well-sm(if='{ !opts.modal }')
         .form-inline
             .form-group
                 label.control-label От даты
