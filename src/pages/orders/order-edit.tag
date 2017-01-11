@@ -112,6 +112,10 @@ order-edit
                                         value='{ item.serviceDate }', readonly)
                                     span.input-group-addon(onclick='{ getServiceDate }')
                                         i.fa.fa-calendar
+                        .col-md-6
+                            .form-group
+                                label.control-label Примечание
+                                input.form-control(name='note', value='{ item.note }')
 
 
     script(type='text/babel').
@@ -123,6 +127,7 @@ order-edit
         self.item = {}
         self.loader = false
         self.sumProducts = 0
+        self.sumServices = 0
         self.total = 0
 
         self.mixin('validation')
@@ -297,11 +302,14 @@ order-edit
 
         self.getServiceDate = () => {
             modals.create('schedule-modal',{
+                serviceDate: self.item.serviceDate,
                 type: 'modal-primary',
                 size: 'modal-lg',
                 submit() {
-                    let items = this.tags.catalog.tags.datatable.getSelectedRows()
-
+                    let event = this.selectedEvent
+                    self.item.serviceDate = event.date + ' ' + event.time
+                    this.modalHide()
+                    self.update()
                 }
             })
         }
