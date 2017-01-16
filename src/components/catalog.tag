@@ -281,6 +281,10 @@ catalog
         self.one('updated', () => {
             self.tags.datatable.on('row-selected', count => {
                 self.selectedCount = count
+                if (self.handlers && self.handlers.onSelected) {
+                    let selectedRows = self.tags.datatable.getSelectedRows()
+                    self.handlers.onSelected(selectedRows)
+                }
                 self.update()
             })
             self.tags.datatable.on('sort', () => {

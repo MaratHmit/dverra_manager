@@ -1,4 +1,5 @@
 | import 'components/catalog.tag'
+| import '../pko/pko-modal.tag'
 
 orders-list
 
@@ -27,7 +28,7 @@ orders-list
                     | Документы&nbsp;
                     span.caret
                 ul.dropdown-menu
-                    li(onclick='{ handlers.printPKO }', class='{ disabled: selectedCount == 0 }')
+                    li(onclick='{ handlers.createPKO }', class='{ disabled: !parent.isAvailablePKO }')
                         a(href='#')
                             |  Приходно-кассовый ордер
                     li(onclick='{ handlers.contract }', class='{ disabled: selectedCount == 0 }')
@@ -59,21 +60,49 @@ orders-list
         self.collection = 'Order'
         self.statuses = []
         self.statusesMap = { text: {}, colors: {} }
+        self.isAvailablePKO = false
 
         self.handlers = {
             statuses: self.statusesMap,
-            printPKO() {
-                API.request({
-                    object: 'DocPKO',
-                    method: 'PRINT',
-                    success(response) {
-                        let w = window.open(response.url, '_blank')
-                        w.onload = function() {
-                            console.log("ok")
-                           // w.print()
+            onSelected(selectedRows) {
+                self.isAvailablePKO = false
+                if (selectedRows.length > 0) {
+                    let item = selectedRows[0]
+                    self.isAvailablePKO = (item.idStatus == 2) || (item.idStatus == 5)
+                }
+            },
+            createPKO() {
+                let rows = this.tags.datatable.getSelectedRows()
+                let item = rows[0]
+                let dateDisplay
+                [dateDisplay, ]= item.dateDisplay.split(" ")
+                modals.create('pko-modal', {
+                    type: 'modal-primary',
+                    idUser: item.idUser,
+                    customer: item.customer,
+                    base: "Заказ № " + item.num + " от " + dateDisplay,
+                    amount: item.amount,
+                    submit() {
+                        let data = this.item
+                        data.idOrder = item.id
+
+                        this.modalHide()
+                        if (data.amount > 0) {
+                            API.request({
+                                object: 'DocPKO',
+                                method: 'Save',
+                                data: data,
+                                success(response) {
+                                    if (response.url)
+                                        window.open(response.url, '_blank')
+                                    popups.create({title: 'Успех!', text: 'Платеж сохранен!', style: 'popup-success'})
+                                    observable.trigger('orders-reload')
+                                }
+                            })
                         }
                     }
                 })
+                $("#pko-amount").focus();
             }
         }
 
