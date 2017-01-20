@@ -41,12 +41,6 @@ order-edit
                             span.input-group-addon(onclick='{ changeCustomer }')
                                 i.fa.fa-list
                         .help-block { error.idUser }
-                .col-md-3
-                    .form-group
-                        label.control-label Статус
-                        select.form-control(name='idStatus')
-                            option(each='{ statuses }', value='{ id }',
-                            selected='{ id == item.idStatus }', no-reorder) { name }
             .row
                 .col-md-12
                     .well.well-sm
@@ -279,27 +273,6 @@ order-edit
             }
         })
 
-        self.getStatuses = () => {
-            let data = { sortBy: "id", sortOrder: "asc", limit: 1000 }
-            API.request({
-                object: 'OrderStatus',
-                data: data,
-                method: 'Fetch',
-                success(response) {
-                    self.statuses = response.items
-                    if (!self.item.idStatus) {
-                        self.statuses.forEach((item) => {
-                            if (item.code == "new") {
-                                self.item.idStatus = item.id
-                                return
-                            }
-                        })
-                    }
-                    self.update()
-                }
-            })
-        }
-
         self.getServiceDate = () => {
             modals.create('schedule-modal',{
                 serviceDate: self.item.serviceDate,
@@ -352,5 +325,3 @@ order-edit
         self.on('mount', () => {
             riot.route.exec()
         })
-
-        self.getStatuses()

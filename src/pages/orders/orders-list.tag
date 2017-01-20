@@ -1,5 +1,6 @@
 | import 'components/catalog.tag'
 | import '../pko/pko-modal.tag'
+| import './order-status-modal.tag'
 
 orders-list
 
@@ -34,6 +35,9 @@ orders-list
                     li(onclick='{ handlers.contract }', class='{ disabled: selectedCount == 0 }')
                         a(href='#')
                             |  Договор
+            button.btn.btn-warning(if='{ selectedCount > 0 }', onclick='{ handlers.setStatus }', title='Изменить статус', type='button')
+                i.fa.fa-check
+                |  Статус
 
         #{'yield'}(to="body")
             datatable-cell(name='num') { row.num }
@@ -42,6 +46,8 @@ orders-list
             datatable-cell(name='customerPhone') { row.customerPhone }
             datatable-cell(name='serviceDate') { row.serviceDate }
             datatable-cell(name='serviceAddress') { row.serviceAddress }
+            datatable-cell(name='debt', style='background-color:{ red: row.debt > 0  } ')
+                span { (row.debt / 1).toLocaleString() } ₽
             datatable-cell(name='amount')
                 span { (row.amount / 1).toLocaleString() } ₽
             datatable-cell(name='status', style='background-color:{ handlers.statuses.colors[row.idStatus]  } ')
@@ -56,7 +62,7 @@ orders-list
         var self = this
 
         self.mixin('permissions')
-        self.mixin('remove')
+
         self.collection = 'Order'
         self.statuses = []
         self.statusesMap = { text: {}, colors: {} }
@@ -68,20 +74,19 @@ orders-list
                 self.isAvailablePKO = false
                 if (selectedRows.length > 0) {
                     let item = selectedRows[0]
-                    self.isAvailablePKO = (item.idStatus == 2) || (item.idStatus == 5)
+                    self.isAvailablePKO = (item.paid < 2)
                 }
             },
             createPKO() {
                 let rows = this.tags.datatable.getSelectedRows()
                 let item = rows[0]
-                let dateDisplay
-                [dateDisplay, ]= item.dateDisplay.split(" ")
+                let [dateDisplay, ]= item.dateDisplay.split(" ")
                 modals.create('pko-modal', {
                     type: 'modal-primary',
                     idUser: item.idUser,
                     customer: item.customer,
                     base: "Заказ № " + item.num + " от " + dateDisplay,
-                    amount: item.amount,
+                    amount: item.debt,
                     submit() {
                         let data = this.item
                         data.idOrder = item.id
@@ -103,6 +108,51 @@ orders-list
                     }
                 })
                 $("#pko-amount").focus();
+            },
+            setStatus() {
+                let rows = this.tags.datatable.getSelectedRows()
+                if (!rows.length)
+                    return true
+
+                let item = rows[0]
+                modals.create('order-status-modal', {
+                    type: 'modal-primary',
+                    statuses: self.statuses,
+                    idStatus: item.idStatus,
+                    submit() {
+                        let data = this.item
+                        data.id = item.id
+                        let _this = this
+                        if (data.idStatus != item.idStatus) {
+                            API.request({
+                                object: 'Order',
+                                method: 'Status',
+                                data: data,
+                                success(response) {
+                                    item.idStatus = data.idStatus
+                                    self.update()
+                                },
+                                error(response) {
+                                    modals.create('bs-alert', {
+                                        type: 'modal-danger',
+                                        title: 'Ошибка учета',
+                                        text: response,
+                                        buttons: [
+                                            {action: 'close', title: 'Закрыть', style: 'btn-danger'},
+                                        ],
+                                        callback: function (action) {
+                                            if (action === 'close')
+                                                this.modalHide()
+                                        }
+                                    })
+                                },
+                                complete() {
+                                    _this.modalHide()
+                                }
+                            })
+                        } else _this.modalHide()
+                    }
+                })
             }
         }
 
@@ -113,6 +163,7 @@ orders-list
             { name: 'customerPhone' , value: 'Телефон' },
             { name: 'serviceDate' , value: 'Дата монтажа' },
             { name: 'serviceAddress' , value: 'Адрес монтажа' },
+            { name: 'debt' , value: 'Долг' },
             { name: 'amount' , value: 'Сумма' },
             { name: 'status' , value: 'Статус заказа' },
             { name: 'note' , value: 'Примечание' },
@@ -128,11 +179,40 @@ orders-list
 
         self.add = () => riot.route('/orders/new')
 
+        self.remove = (e, items, tag) => {
+            let rows = this.tags.datatable.getSelectedRows()
+            let item = rows[0]
+            let params = {ids: [item.id]}
+
+            modals.create('bs-alert', {
+                type: 'modal-danger',
+                title: 'Предупреждение',
+                text: 'Отменить выбранный заказ?',
+                size: 'modal-sm',
+                    buttons: [
+                        {action: 'yes', title: 'Удалить', style: 'btn-danger'},
+                        {action: 'no', title: 'Отмена', style: 'btn-default'},
+                    ],
+                callback(action) {
+                    if (action === 'yes') {
+                        API.request({
+                            object: 'Orders',
+                            method: 'Cancel',
+                            data: params,
+                            success(response) {
+                                popups.create({title: 'Заказ успешно отменен!', style: 'popup-success'})
+                                tag.reload()
+                            }
+                        })
+                    }
+                    this.modalHide()
+                }
+            })
+        }
+
         self.getStatuses = () => {
-            let data = { sortBy: "id", sortOrder: "asc", limit: 1000 }
             API.request({
                 object: 'OrderStatus',
-                data: data,
                 method: 'Fetch',
                 success(response) {
                     self.statuses = response.items

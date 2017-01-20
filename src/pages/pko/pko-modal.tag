@@ -12,7 +12,7 @@ pko-modal
                     input.form-control(name='base', value='{ item.base }', readonly)
                 .form-group
                     label.control-label Сумма оплаты
-                    input.form-control(id='pko-amount', name='amount', value='{ (item.amount / 1).toFixed(2) }', type='number')
+                    input.form-control(id='pko-amount', name='amount', value='{ item.amount }', type='number')
 
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть
