@@ -29,13 +29,13 @@ orders-list
                     | Документы&nbsp;
                     span.caret
                 ul.dropdown-menu
-                    li(onclick='{ handlers.createPKO }', class='{ disabled: !parent.isAvailablePKO }')
+                    li(onclick='{ handlers.createPKO }', class='{ disabled: !parent.isAllowedPKO }')
                         a(href='#')
                             |  Приходно-кассовый ордер
                     li(onclick='{ handlers.contract }', class='{ disabled: selectedCount == 0 }')
                         a(href='#')
                             |  Договор
-            button.btn.btn-warning(if='{ selectedCount > 0 }', onclick='{ handlers.setStatus }', title='Изменить статус', type='button')
+            button.btn.btn-warning(if='{ parent.isAllowedStatus }', onclick='{ handlers.setStatus }', title='Изменить статус', type='button')
                 i.fa.fa-check
                 |  Статус
 
@@ -66,15 +66,21 @@ orders-list
         self.collection = 'Order'
         self.statuses = []
         self.statusesMap = { text: {}, colors: {} }
-        self.isAvailablePKO = false
+        self.isAllowedPKO = false
+        self.isAllowedStatus = false
 
         self.handlers = {
             statuses: self.statusesMap,
             onSelected(selectedRows) {
-                self.isAvailablePKO = false
+                self.isAllowedPKO = false
+                self.isAllowedStatus = false
                 if (selectedRows.length > 0) {
                     let item = selectedRows[0]
-                    self.isAvailablePKO = (item.paid < 2)
+                    self.isAllowedPKO = (item.paid < 2)
+                }
+                if (selectedRows.length > 0) {
+                    let item = selectedRows[0]
+                    self.isAllowedStatus = (item.status != 'canceled' && item.status != 'completed')
                 }
             },
             createPKO() {
@@ -170,7 +176,8 @@ orders-list
         ]
 
         self.orderOpen = function (e) {
-            riot.route(`/orders/${e.item.row.id}`)
+            if (e.item.row.status != 'canceled' && e.item.row.status != 'completed')
+                riot.route(`/orders/${e.item.row.id}`)
         }
 
         self.getAggregation = (response, xhr) => {
@@ -180,9 +187,7 @@ orders-list
         self.add = () => riot.route('/orders/new')
 
         self.remove = (e, items, tag) => {
-            let rows = this.tags.datatable.getSelectedRows()
-            let item = rows[0]
-            let params = {ids: [item.id]}
+            let params = {id: items[0]}
 
             modals.create('bs-alert', {
                 type: 'modal-danger',
@@ -190,13 +195,13 @@ orders-list
                 text: 'Отменить выбранный заказ?',
                 size: 'modal-sm',
                     buttons: [
-                        {action: 'yes', title: 'Удалить', style: 'btn-danger'},
-                        {action: 'no', title: 'Отмена', style: 'btn-default'},
+                        {action: 'yes', title: 'Да', style: 'btn-default'},
+                        {action: 'no', title: 'Нет', style: 'btn-danger'},
                     ],
                 callback(action) {
                     if (action === 'yes') {
                         API.request({
-                            object: 'Orders',
+                            object: 'Order',
                             method: 'Cancel',
                             data: params,
                             success(response) {
