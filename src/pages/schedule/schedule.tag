@@ -13,6 +13,17 @@ schedule
             .form-inline.m-b-2
                 button.btn.btn-success(onclick='{ reload }', title='Обновить', type='button')
                     i.fa.fa-refresh
+                .dropdown(if='{ isSelected }', style='display: inline-block;')
+                    button.btn.btn-default.dropdown-toggle(data-toggle="dropdown", aria-haspopup="true", type='button', aria-expanded="true")
+                        | Действия&nbsp;
+                        span.caret
+                    ul.dropdown-menu
+                        li(onclick='{ handlers.block }')
+                            a(href='#')
+                                |  Запретить для выбора
+                        li(onclick='{ handlers.unBlock }')
+                            a(href='#')
+                                |  Разрешить для выбора
     .table-responsive
         table.table.table-bordered
             thead
@@ -49,6 +60,36 @@ schedule
         self.loader = false
         self.items = []
         self.startDate = (new Date()).toLocaleDateString()
+        self.isSelected = false
+
+        self.handlers = {
+            block() {
+                self.saveBusy(true)
+            },
+            unBlock() {
+                self.saveBusy(false)
+            }
+        }
+
+        self.saveBusy = (isBusy) => {
+            let params = { events: [] };
+            self.items.forEach(function(item) {
+                item.events.forEach(function(event) {
+                    if (event.selected && (event.busy != isBusy)) {
+                        event.busy = isBusy
+                        params.events.push(event)
+                    }
+                })
+            })
+            API.request({
+                object: 'Schedule',
+                method: 'Save',
+                data: params,
+                success() {
+                    self.reload()
+                }
+            })
+        }
 
         self.reload = () => {
 
@@ -79,7 +120,7 @@ schedule
 
         function setEventUnselected (event) {
             if (event.selected)
-                event.color = "#FFFFFF"
+                event.color = event.primaryColor
             event.selected = false
         }
 
@@ -108,7 +149,7 @@ schedule
                 item.events.forEach(function(event) {
                     if (start == event)
                         doSelect = true
-                    if (doSelect && !event.busy)
+                    if (doSelect)
                         setEventSelected(event)
                     if (end == event) {
                         isFinish = true
@@ -125,8 +166,6 @@ schedule
         var lastSelectedEvent = null
         self.rowClick = function (e) {
             var event = e.item.event
-            if (event.busy)
-                return true;
 
             var currentSelectedEvent = event
 
@@ -149,6 +188,18 @@ schedule
 
             if (!e.shiftKey)
                 lastSelectedEvent = currentSelectedEvent
+
+            self.isSelected = false
+            self.items.forEach(function(item) {
+                item.events.forEach(function(event) {
+                    self.isSelected |= event.selected
+                    if (self.isSelected)
+                        return true;
+                })
+                if (self.isSelected)
+                    return true;
+            })
+
             this.__lastClick__ = currentClick
         }
 
