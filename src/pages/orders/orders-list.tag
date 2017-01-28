@@ -14,10 +14,10 @@ orders-list
                 .form-inline
                     .form-group
                         label.control-label От даты
-                        datetime-picker.form-control(data-name='date', data-sign='>=', format='YYYY-MM-DD')
+                        datetime-picker.form-control(data-name='date', data-sign='>=', format='DD.MM.YYYY')
                     .form-group
                         label.control-label До даты
-                        datetime-picker.form-control(data-name='date', data-sign='<=', format='YYYY-MM-DD')
+                        datetime-picker.form-control(data-name='date', data-sign='<=', format='DD.MM.YYYY')
                     .form-group
                         label.control-label Статус заказа
                         select.form-control(data-name='idStatus')

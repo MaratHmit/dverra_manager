@@ -1,15 +1,30 @@
 | import 'pages/orders/orders-list.tag'
 | import 'pages/orders/order-edit.tag'
+| import 'pages/pko/pko-list.tag'
 
 orders
-    orders-list(if='{ tab == "orders" && !edit }')
-    order-edit(if='{ tab == "orders" && edit }')
+    ul(if='{ !edit }').nav.nav-tabs.m-b-2
+        li(each='{ tabs }', class='{ active: name == tab }')
+            a(href='#orders/{ link }')
+                span { title }
+
+    .column
+        orders-list(if='{ tab == "orders" && !edit }')
+        order-edit(if='{ tab == "orders" && edit }')
+        pko-list(if='{ tab == "pko" && !edit }')
 
     script(type='text/babel').
         var self = this
 
         self.edit = false
         self.notFound = false
+
+        self.tab = ''
+
+        self.tabs = [
+            {title: 'Заказы', name: 'orders', link: ''},
+            {title: 'Приходные ордера', name: 'pko', link: 'pko'},
+        ]
 
         var route = riot.route.create()
 
