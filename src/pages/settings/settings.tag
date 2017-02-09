@@ -15,6 +15,8 @@
 | import 'pages/settings/sms/sms-template-edit.tag'
 | import 'pages/settings/services/services.tag'
 | import 'pages/settings/services/service-edit.tag'
+| import 'pages/settings/docs/docs.tag'
+| import 'pages/settings/docs/docs-edit.tag'
 
 settings
     .row
@@ -42,6 +44,7 @@ settings
                 h4 Яндекс.Фотки - в разработке
             settings-synhro-1c(if='{ tab == "settings-synhro-1c" && !edit }')
             services(if='{ tab == "services" && !edit }')
+            docs(if='{ tab == "docs" && !edit }')
 
         .col-md-12
             delivery-edit(if='{ tab == "delivery" && edit }')
@@ -50,6 +53,7 @@ settings
             permission-rights-edit(if='{ tab == "permissions" && edit }')
             sms-template-edit(if='{ tab == "sms" && edit }')
             service-edit(if='{ tab == "services" && edit }')
+            docs-edit(if='{ tab == "docs" && edit }')
 
     script(type='text/babel').
         var self = this,
@@ -118,6 +122,7 @@ settings
             {title: 'SEO переменные', name: 'seo-variables', link: 'seo-variables', permission: 'settings'},
             {title: 'Поля', name: 'fields', link: 'fields', permission: 'settings'},
             {title: 'Параметры сервисов', name: 'services', link: 'services', permission: 'settings'},
+            {title: 'Шаблоны документов', name: 'docs', link: 'docs', permission: 'settings'},
             //{title: 'Яндекс.Фотки', name: 'yandex-photos', link: 'yandex-photos', permission: 'settings'},
             //{title: 'Интеграция с 1С', name: 'settings-synhro-1c', link: 'settings-synhro-1c', permission: 'settings'},
         ]

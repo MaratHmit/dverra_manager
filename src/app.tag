@@ -146,7 +146,7 @@ app
         self.sidebar = [
             {title: 'Заявки', name: 'requests', link: 'requests', permission: 'orders', icon: 'fa-tasks'},
             {title: 'Заказы', name: 'orders', link: 'orders', permission: 'orders', icon: 'fa-shopping-cart'},
-            {title: 'График услуг', name: 'schedule', link: 'schedule', permission: 'orders', icon: 'fa-calendar'},
+            {title: 'Графики', name: 'schedule', link: 'schedule', permission: 'orders', icon: 'fa-calendar'},
             {title: 'Витрина', name: 'products', link: 'products', permission: 'products', icon: 'fa-shopping-bag'},
             {title: 'Склад', name: 'warehouse', link: 'warehouse', permission: 'products', icon: 'fa-building-o'},
         //{title: 'Платежи', name: 'payments', link: 'payments', permission: 'payments', icon: 'fa-money'},

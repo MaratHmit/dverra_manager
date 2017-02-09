@@ -1,15 +1,28 @@
 | import 'pages/requests/requests-list.tag'
 | import 'pages/requests/request-edit.tag'
+| import 'pages/requests/measurements-list.tag'
 
 requests
-    requests-list(if='{ tab == "requests" && !edit }')
-    request-edit(if='{ tab == "requests" && edit }')
+    ul(if='{ !edit }').nav.nav-tabs.m-b-2
+        li(each='{ tabs }', class='{ active: name == tab }')
+            a(href='#requests/{ link }')
+                span { title }
+
+    .column
+        requests-list(if='{ tab == "requests" && !edit }')
+        request-edit(if='{ tab == "requests" && edit }')
 
     script(type='text/babel').
         var self = this
 
         self.edit = false
         self.notFound = false
+
+        self.tabs = [
+            {title: 'Заявки', name: 'requests', link: ''},
+            {title: 'Замеры', name: 'measurements', link: 'measurements'},
+        ]
+
 
         var route = riot.route.create()
 
