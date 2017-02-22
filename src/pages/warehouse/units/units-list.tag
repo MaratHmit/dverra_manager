@@ -15,6 +15,8 @@ units-list
                     datatable-cell(name='name') { row.name }
                     datatable-cell(name='price')
                         span { (row.price / 1).toLocaleString() } ₽
+                    datatable-cell(name='pricePurchase')
+                        span { (row.pricePurchase / 1).toLocaleString() } ₽
                     datatable-cell(name='count') { row.count / 1 }
                     datatable-cell(name='reserved',
                         class=' { handlers.getColor(0, row.reserved) } ') { row.reserved / 1 }
@@ -47,7 +49,8 @@ units-list
             {name: 'id', value: '#'},
             {name: 'code', value: 'Код' },
             {name: 'name', value: 'Наименование' },
-            {name: 'price', value: 'Цена' },
+            {name: 'price', value: 'Цена пр.' },
+            {name: 'pricePurchase', value: 'Цена зак.' },
             {name: 'count', value: 'Кол-во' },
             {name: 'reserved', value: 'Резерв' },
             {name: 'rest', value: 'Остаток' },

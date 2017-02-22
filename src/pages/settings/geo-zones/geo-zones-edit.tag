@@ -21,7 +21,7 @@ geo-zones-edit
                     .help-block { error.name }
             .row
                 .col-md-6: catalog-static(name='{ regions }', add='{ addRegion }',
-                    cols='{ cols }', rows='{ item.regions }', handlers='{ handlers }')
+                    cols='{ cols }', rows='{ item.regions }', after-remove='{ afterRemove }')
                     #{'yield'}(to='body')
                         datatable-cell(name='id') { row.id }
                         datatable-cell(name='region') { row.region }
@@ -34,12 +34,17 @@ geo-zones-edit
 
         self.mixin('validation')
         self.mixin('change')
+        self.mixin('permissions')
 
         self.rules = {
             name: 'empty',
         }
 
-        self.cols = [
+        self.item = {
+            regions: []
+        }
+
+         self.cols = [
             {name: 'id', value: '#'},
             {name: 'region', value: 'Регион'},
             {name: 'city', value: 'Город'},
@@ -52,9 +57,19 @@ geo-zones-edit
                 isNew: true,
                 submit() {
                     var _this = this
-
+                    self.item.regions.push(_this.item)
+                    self.update()
+                    _this.modalHide()
                 }
             })
+        }
+
+        self.afterRemove = (items) => {
+
+            self.item.regions = self.item.regions.filter(item => {
+                return items.indexOf(item) === -1
+            })
+            self.update()
         }
 
         observable.on('geo-zones-edit', id => {

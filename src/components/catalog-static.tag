@@ -90,7 +90,7 @@ catalog-static
             self.root.dispatchEvent(event)
 
             if (typeof(opts.afterRemove) === 'function') {
-                opts.afterRemove.bind(self)()
+                opts.afterRemove.bind(self)(items)
             }
         }
 

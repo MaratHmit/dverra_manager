@@ -39,6 +39,9 @@ geo-zones-region-edit-modal
                 modal.mixin('validation')
                 modal.mixin('change')
 
+                if (!modal.item.region)
+                    modal.item.region = "Москва"
+
                 modal.rules = {
                     region: 'empty',
                     city: 'empty',
