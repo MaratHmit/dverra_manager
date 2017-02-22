@@ -22,6 +22,11 @@ products-list
                     .well.well-sm
                         .form-inline
                             .form-group
+                                label.control-label Видимость
+                                select.form-control(data-name='isActive')
+                                    option(value='1') Отображаемые
+                                    option(value='0') Неотображаемые
+                            .form-group
                                 label.control-label Бренды
                                 select.form-control(data-name='idBrand', onchange='{ parent.selectBrand }')
                                     option(value='') Все
@@ -94,7 +99,7 @@ products-list
                         ontouchend='{ handlers.permission(handlers.boolChange, "products", "0010") }',
                         ontouchstart='{ stopPropagation }',
                         disabled='{ !handlers.checkPermission("products", "0010") }')
-                            i(class='fa { row.enabled == "Y" ? "fa-eye" : "fa-eye-slash text-muted" } ')
+                            i(class='fa { row.isActive ? "fa-eye" : "fa-eye-slash text-muted" } ')
                     datatable-cell(name='article') { row.article }
                     datatable-cell(name='name') { row.name }
                     datatable-cell(name='nameBrand') { row.nameBrand }

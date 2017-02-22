@@ -48,7 +48,7 @@ app.init = () => {
     if (storage && storage.hostname) {
         app.config.project = storage.project
         app.config.lang = 'rus'
-        app.config.projectURL = `http://${storage.hostname}/`
+        app.config.projectURL = process.env.NODE_ENV === 'development' ? `http://test.dverra.ru/` : "/"
         app.config.isAdmin = storage.isAdmin || false
         app.auth = true
     } else {
@@ -124,9 +124,16 @@ app.getImageRelativeUrl = function (path, name, root = '/images') {
 }
 
 app.getImageUrl = function (path, name, root = '/images') {
+    if (process.env.NODE_ENV === 'development') {
+        let url
+        url = name
+            ? app.clearLink(`${app.config.projectURL}${root}/${path}/${name}`)
+            : app.clearLink(`${app.config.projectURL}${root}${path}`)
+        return url
+    }
     return name
-        ? app.clearLink(`${app.config.projectURL}${root}/${path}/${name}`)
-        : app.clearLink(`${app.config.projectURL}${root}${path}`)
+        ? app.clearLink(`../${root}/${path}/${name}`)
+        : app.clearLink(`../${root}${path}`)
 }
 
 app.getImagePreviewURL = function (path, name, size = 64, root = 'images') {

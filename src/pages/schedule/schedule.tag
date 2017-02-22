@@ -22,7 +22,6 @@ schedule
                     self.schedules = response.items
                     if (self.schedules.length) {
                         self.idSchedule = self.schedules[0].id
-                        console.log(self.idSchedule)
                         self.update()
                     }
                 }

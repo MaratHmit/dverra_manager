@@ -5,6 +5,8 @@
 | import 'pages/products/shop-services/shop-services-list-select-modal.tag'
 | import 'pages/schedule/schedule-modal.tag'
 | import 'components/loader.tag'
+| import 'pages/persons/person-new-modal.tag'
+| import 'inputmask'
 
 order-edit
     loader(if='{ loader }')
@@ -37,9 +39,11 @@ order-edit
                             href='{ "#persons/" + item.idUser }', target='_blank')
                                 i.fa.fa-eye
                             input.form-control(name='idUser',
-                            value='{ item.idUser ? item.idUser + " - " + item.customer : "" }', readonly)
+                                value='{ item.idUser ? item.idUser + " - " + item.customer : "" }', readonly)
                             span.input-group-addon(onclick='{ changeCustomer }')
                                 i.fa.fa-list
+                            span.input-group-addon(onclick='{ newCustomer }')
+                                i.fa.fa-plus
                         .help-block { error.idUser }
             .row
                 .col-md-12
@@ -229,6 +233,45 @@ order-edit
             })
         }
 
+        self.newCustomer = () => {
+            modals.create('person-new-modal', {
+                type: 'modal-primary',
+                submit() {
+                    var _this = this
+                    var params = { name: _this.name.value, phone: _this.phone.value, email: _this.email.value }
+                    API.request({
+                        object: 'User',
+                        method: 'Save',
+                        data: params,
+                        success(response) {
+                            popups.create({title: 'Успех!', text: 'Контакт добавлен!', style: 'popup-success'})
+                            _this.modalHide()
+                            self.item.idUser = response.id
+                            self.item.customer = response.name
+                            self.update()
+                            if (response.isExist) {
+                                modals.create('bs-alert', {
+                                    type: 'modal-danger',
+                                    title: 'Предупреждение',
+                                    text: 'Внимание! Контакт с указанным новером уже существует!\nБудет взят контакт из справочника!',
+                                    size: 'modal-sm',
+                                    buttons: [
+                                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                                    ],
+                                    callback() {
+                                        this.modalHide()
+                                        _this.modalHide()
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
+        }
+
+
         self.submit = e => {
             var params = self.item
             self.error = self.validation.validate(self.item, self.rules())
@@ -276,6 +319,7 @@ order-edit
         self.getServiceDate = () => {
             modals.create('schedule-modal',{
                 serviceDate: self.item.serviceDate,
+                idSchedule: 1,
                 type: 'modal-primary',
                 size: 'modal-lg',
                 submit() {

@@ -50,7 +50,7 @@ person-edit
                         .col-md-6
                             .form-group
                                 label.control-label Логин
-                                input.form-control(name='login', type='text', value='{ item.login }')
+                                input.form-control(name='login', type='text', value='{ item.login }', readonly)
                         .col-md-6
                             .form-group
                                 label.control-label Пароль

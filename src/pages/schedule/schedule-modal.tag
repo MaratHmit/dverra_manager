@@ -36,6 +36,10 @@ schedule-modal
         self.on('mount', () => {
             let modal = self.tags['bs-modal']
             let serviceDate = opts.serviceDate
+            let params = {
+                idSchedule: opts.idSchedule
+            }
+
             modal.loader = true
             modal.isSelected = false
             modal.selectedEvent = null
@@ -43,8 +47,9 @@ schedule-modal
             self.update()
 
             API.request({
-                object: 'Schedule',
+                object: 'ScheduleEvent',
                 method: 'Fetch',
+                data: params,
                 success(response) {
                     modal.items = response.items
                     if (serviceDate) {

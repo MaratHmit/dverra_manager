@@ -143,7 +143,22 @@ unit-edit
             self.error = false
             self.isNew = true
             self.item = {}
+            self.item.stockPrices = []
             self.update()
+            let idGroup = localStorage.getItem("idUnitGroup")
+            if (idGroup) {
+                let params = { id: idGroup }
+                API.request({
+                    object: 'UnitGroup',
+                    method: 'Info',
+                    data: params,
+                    success(response) {
+                        self.item.idGroup = response.id
+                        self.item.nameGroup = response.name
+                        self.update()
+                    }
+                })
+            }
         })
 
         observable.on('unit-edit', id => {

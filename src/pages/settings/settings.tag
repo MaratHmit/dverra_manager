@@ -17,6 +17,8 @@
 | import 'pages/settings/services/service-edit.tag'
 | import 'pages/settings/docs/docs.tag'
 | import 'pages/settings/docs/docs-edit.tag'
+| import 'pages/settings/geo-zones/geo-zones.tag'
+| import 'pages/settings/geo-zones/geo-zones-edit.tag'
 
 settings
     .row
@@ -45,6 +47,7 @@ settings
             settings-synhro-1c(if='{ tab == "settings-synhro-1c" && !edit }')
             services(if='{ tab == "services" && !edit }')
             docs(if='{ tab == "docs" && !edit }')
+            geo-zones(if='{ tab == "geo-zones" && !edit }')
 
         .col-md-12
             delivery-edit(if='{ tab == "delivery" && edit }')
@@ -54,6 +57,7 @@ settings
             sms-template-edit(if='{ tab == "sms" && edit }')
             service-edit(if='{ tab == "services" && edit }')
             docs-edit(if='{ tab == "docs" && edit }')
+            geo-zones-edit(if='{ tab == "geo-zones" && edit }')
 
     script(type='text/babel').
         var self = this,
@@ -91,6 +95,11 @@ settings
             }
         })
 
+        route('/settings/geo-zones/new', tab => {
+            self.update({edit: true, tab: 'geo-zones'})
+            observable.trigger('geo-zones-new')
+        })
+
         route('/settings/pay-systems/new', tab => {
             self.update({edit: true, tab: 'pay-systems'})
             observable.trigger('pay-systems-new')
@@ -114,15 +123,16 @@ settings
         self.tab = ''
         self.tabs = [
             {title: 'Настройки магазина', name: 'main', link: 'main', permission: 'settings'},
-            {title: 'Доставки', name: 'delivery', link: 'delivery', permission: 'deliveries'},
-            {title: 'Платежные системы', name: 'pay-systems', link: 'pay-systems', permission: 'paysystems'},
+            //{title: 'Доставки', name: 'delivery', link: 'delivery', permission: 'deliveries'},
+           // {title: 'Платежные системы', name: 'pay-systems', link: 'pay-systems', permission: 'paysystems'},
             {title: 'Уведомления', name: 'notice', link: 'notice', permission: 'notices'},
             //{title: 'Валюты', name: 'currencies', link: 'currencies', permission: 'currencies'},
             //{title: 'Права доступа', name: 'permissions', link: 'permissions', permission: 'settings', admin: true},
             {title: 'SEO переменные', name: 'seo-variables', link: 'seo-variables', permission: 'settings'},
-            {title: 'Поля', name: 'fields', link: 'fields', permission: 'settings'},
+            //{title: 'Поля', name: 'fields', link: 'fields', permission: 'settings'},
             {title: 'Параметры сервисов', name: 'services', link: 'services', permission: 'settings'},
             {title: 'Шаблоны документов', name: 'docs', link: 'docs', permission: 'settings'},
+            {title: 'ГЕО зоны', name: 'geo-zones', link: 'geo-zones', permission: 'settings'},
             //{title: 'Яндекс.Фотки', name: 'yandex-photos', link: 'yandex-photos', permission: 'settings'},
             //{title: 'Интеграция с 1С', name: 'settings-synhro-1c', link: 'settings-synhro-1c', permission: 'settings'},
         ]

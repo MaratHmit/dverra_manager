@@ -29,7 +29,7 @@ schedule-events
             thead
                 tr
                     th Время
-                    th Заказ/замер/заявка
+                    th Заказ/замер
                     th Адрес
                     th Заказчик
                     th Телефон

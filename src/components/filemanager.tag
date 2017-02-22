@@ -444,8 +444,8 @@ filemanager
                 success(response) {
                     let value = response.items
                     if (value instanceof Array) {
-                        let folders = value.filter(i => i.isDir).sort((a, b) => a.name > b.name)
-                        let files = value.filter(i => !i.isDir).sort((a, b) => a.name > b.name)
+                        let folders = value.filter(i => i.isDir)
+                        let files = value.filter(i => !i.isDir)
                         self.value = opts.value = self.root.value = [...folders, ...files]
                     } else {
                         self.value = opts.value = self.root.value = []

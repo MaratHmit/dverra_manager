@@ -1,6 +1,7 @@
 | import 'pages/requests/requests-list.tag'
 | import 'pages/requests/request-edit.tag'
 | import 'pages/requests/measurements-list.tag'
+| import 'pages/requests/measurement-edit.tag'
 
 requests
     ul(if='{ !edit }').nav.nav-tabs.m-b-2
@@ -11,6 +12,8 @@ requests
     .column
         requests-list(if='{ tab == "requests" && !edit }')
         request-edit(if='{ tab == "requests" && edit }')
+        measurements-list(if='{ tab == "measurements" && !edit }')
+        measurement-edit(if='{ tab == "measurements" && edit }')
 
     script(type='text/babel').
         var self = this
@@ -39,6 +42,20 @@ requests
             self.notFound = false
             self.tab = 'requests'
             self.update()
+        })
+
+        route('/requests/measurements/([0-9]+)', (tab, id) => {
+            self.edit = true
+            self.tab = 'measurements'
+            self.update()
+            observable.trigger('measurement-edit', id)
+        })
+
+        route('/requests/measurements/new', () => {
+            self.edit = true
+            self.tab = 'measurements'
+            self.update()
+            observable.trigger('measurement-new')
         })
 
         route('/requests/*', tab => {

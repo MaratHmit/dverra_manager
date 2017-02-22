@@ -27,18 +27,23 @@ request-edit
                             option(value='0', selected='{ item.status == 0 }') Новая
                             option(value='1', selected='{ item.status == 1 }') В работе
                             option(value='2', selected='{ item.status == 2 }') Завершенная
-                .col-md-3
+                .col-md-4
                     .form-group
                         label.control-label Имя
                         input.form-control(name='name', value='{ item.name }')
-                .col-md-3
+                .col-md-4
                     .form-group
                         label.control-label Телефон
                         input.form-control(name='phone', value='{ item.phone }')
+            .row
                 .col-md-2
                     .form-group
                         label.control-label IP адрес
                         input.form-control(name='ip', value='{ item.ip }', readonly='true')
+                .col-md-10
+                    .form-group
+                        label.control-label ГЕО локация
+                        input.form-control(name='geoLocation', value='{ item.geoLocation }', readonly='true')
             .row
                 .col-md-12
                     .form-group

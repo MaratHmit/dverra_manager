@@ -1,7 +1,6 @@
 var API = {
     version: process.env.NODE_ENV === 'development' ? '2_dev' : '2',
-    url: process.env.NODE_ENV === 'development' ? 'http://dverra1.e-stile.ru/api/' : 'http://dverra.ru/api/',
-    //url: process.env.NODE_ENV === 'development' ? 'http://dverra1.e-stile.ru/api/' : 'http://dverra1.e-stile.ru/api/',
+    url: process.env.NODE_ENV === 'development' ? 'http://test.dverra.ru/api/' : '/api/',
     complete(params) {
         if (!('notFoundRedirect' in params))
             params.notFoundRedirect = true

@@ -481,19 +481,6 @@ product-edit
                         }
                     })
                 },
-                //                  callback => {
-                //                      API.request({
-                //                          object: 'ProductType',
-                //                          method: 'Fetch',
-                //                          success(response) {
-                //                              self.productTypes = response.items
-                //                             callback(null, 'ProductType')
-                //                          },
-                //                          error(response) {
-                //                              callback('error', null)
-                //                          }
-                //                      })
-                //                  }
             ], (err, res) => {
                 if (typeof callback === 'function')
                     callback.bind(this)()

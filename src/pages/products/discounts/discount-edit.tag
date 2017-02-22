@@ -25,10 +25,10 @@ discount-edit
                 #discount-edit-parameters.tab-pane.fade.in.active
                     .row
                         .col-md-4
-                            .form-group(class='{ has-error: error.title }')
+                            .form-group(class='{ has-error: error.name }')
                                 label.control-label Наименование
-                                input.form-control(name='title', value='{ item.title }')
-                                .help-block { error.title }
+                                input.form-control(name='name', value='{ item.name }')
+                                .help-block { error.name }
                         .col-md-2
                             .form-group
                                 label.control-label Тип контакта
@@ -165,7 +165,7 @@ discount-edit
         self.item = {}
 
         self.rules = {
-            title: 'empty'
+            name: 'empty'
         }
 
         self.afterChange = e => {

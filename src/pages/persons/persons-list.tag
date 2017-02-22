@@ -49,7 +49,7 @@ persons-list
                 type: 'modal-primary',
                 submit() {
                     var _this = this
-                    var params = { name: _this.name.value }
+                    var params = { name: _this.name.value, phone: _this.phone.value, email: _this.email.value }
                     API.request({
                         object: 'User',
                         method: 'Save',
@@ -64,6 +64,7 @@ persons-list
                     })
                 }
             })
+            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
         }
 
         self.personOpen = e => {

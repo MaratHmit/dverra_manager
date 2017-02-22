@@ -19,12 +19,17 @@ requests-list
                             option(value='0') Новые
                             option(value='1') В работе
                             option(value='2') Завершенные
+        #{'yield'}(to='head')
+            button.btn.btn-warning(if='{ parent.isAllowedStatus }', onclick='{ handlers.createMeasurement }', title='Создать замер', type='button')
+                i.fa.fa-check
+                |  Замер
 
         #{'yield'}(to="body")
             datatable-cell(name='id') { row.id }
             datatable-cell(name='date') { row.dateDisplay }
             datatable-cell(name='name') { row.name }
             datatable-cell(name='phone') { row.phone }
+            datatable-cell(name='geo') { row.geoLocation }
             datatable-cell(name='ip') { row.ip }
             datatable-cell(name='note') { row.note }
             datatable-cell(name='status', class='{ handlers.statuses.colors[row.status]  } ')
@@ -38,9 +43,17 @@ requests-list
         self.collection = 'Request'
         self.statuses = []
         self.statusesMap = { text: ['Новая', 'В работе', 'Завершенная'], colors: ['bg-danger', 'bg-warning', 'bg-success'] }
+        self.isAllowedStatus = false
 
         self.handlers = {
-            statuses: self.statusesMap
+            statuses: self.statusesMap,
+             onSelected(selectedRows) {                
+                self.isAllowedStatus = false
+                if (selectedRows.length > 0) {
+                    let item = selectedRows[0]
+                    self.isAllowedStatus = !item.status
+                }
+            }
         }
 
         self.cols = [
@@ -48,6 +61,7 @@ requests-list
             { name: 'date' , value: 'Дата' },
             { name: 'name' , value: 'Имя' },
             { name: 'phone' , value: 'Телефон' },
+            { name: 'geo' , value: 'ГЕО локация' },
             { name: 'ip' , value: 'IP адрес' },
             { name: 'note' , value: 'Заметка' },
             { name: 'status' , value: 'Статус' },

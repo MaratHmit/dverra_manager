@@ -53,7 +53,12 @@ units-list
             {name: 'rest', value: 'Остаток' },
         ]
 
-        self.add = () => riot.route('/warehouse/new')
+        self.add = () => {
+            localStorage.removeItem("idUnitGroup")
+            if (self.selectedCategory)
+                localStorage.setItem("idUnitGroup", self.selectedCategory)
+            riot.route('/warehouse/new')
+        }
 
         self.edit = e => riot.route(`/warehouse/${e.item.row.id}`)
 
@@ -73,5 +78,6 @@ units-list
         })
 
         observable.on('units-reload', () => {
+            localStorage.removeItem("idUnitGroup")
             self.tags.catalog.reload()
         })
