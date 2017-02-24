@@ -1,5 +1,5 @@
 geo-zones
-    catalog(object='GeoZone', cols='{ cols }', reload='true', handlers='{ handlers }',
+    catalog(object='GeoZone', cols='{ cols }', reload='true', handlers='{ handlers }', remove='{ remove }',
         add='{ permission(add, "settings", "0100") }', dblclick='{ permission(edit, "settings", "1000") }')
         #{'yield'}(to='body')
             datatable-cell(name='id') { row.id }

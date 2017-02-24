@@ -7,7 +7,7 @@ measurement-edit
     loader(if='{ loader }')
     virtual(hide='{ loader }')
         .btn-group
-            a.btn.btn-default(href='#requests') #[i.fa.fa-chevron-left]
+            a.btn.btn-default(href='#requests/measurements') #[i.fa.fa-chevron-left]
             button.btn.btn-default(onclick='{ submit }', type='button')
                 i.fa.fa-floppy-o
                 |  Сохранить
@@ -44,6 +44,53 @@ measurement-edit
                     .form-group
                         label.control-label Телефон
                         input.form-control(name='phone', value='{ item.phone }', readonly)
+            .row
+                .col-md-12
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Адрес замера
+                        .panel-body
+                            .col-md-2
+                                .form-group
+                                    label.control-label Регион
+                                    select.form-control(name='idAddressRegion', value='{ item.idAddressRegion }', onchange='{ regionChange }')
+                                        option(each='{ regions }', value='{ id }',
+                                            selected='{ id == item.idAddressRegion }', no-reorder) { name }
+                            .col-md-2
+                                .form-group
+                                    label.control-label Город
+                                    select.form-control(name='idAddressCity', value='{ item.idAddressCity }', onchange='{ cityChange }')
+                                        option(each='{ cities }', value='{ id }',
+                                        selected='{ id == item.idAddressCity }', no-reorder) { name }
+                            .col-md-2
+                                .form-group
+                                    label.control-label Улица
+                                    input.form-control(name='addressStreet', value='{ item.addressStreet }')
+                            .col-md-1
+                                .form-group
+                                    label.control-label Дом/строение
+                                    input.form-control(name='addressBuilding', value='{ item.addressBuilding }')
+                            .col-md-1
+                                .form-group
+                                    label.control-label Квартира
+                                    input.form-control(name='addressApartment', value='{ item.addressApartment }')
+                            .col-md-4
+                                .form-group
+                                    label.control-label Примечание по адресу
+                                    input.form-control(name='addressNote', value='{ item.addressNote }')
+            .row
+                .col-md-3
+                    .form-group
+                        label.control-label Дата и время выполнения замера
+                        .input-group
+                            input.form-control(name='measurementDate',
+                            value='{ item.measurementDate }', readonly)
+                            span.input-group-addon(onclick='{ getMeasurementDate }')
+                                i.fa.fa-calendar
+                .col-md-9
+                    .form-group
+                        label.control-label Примечание по замеру
+                        input.form-control(name='note', value='{ item.note }')
 
 
 
@@ -56,6 +103,8 @@ measurement-edit
 
         self.isNew = false
         self.item = {}
+        self.regions = []
+        self.cities = []
 
         self.reload = e => {
             observable.trigger('request-edit', self.item.id)
@@ -167,9 +216,41 @@ measurement-edit
                 }
             })
         })
-        
+
+        self.getRegions = () => {
+            API.request({
+                object: 'AtdRegion',
+                method: 'Fetch',
+                success(response) {
+                    self.regions = response.items
+                    if (self.regions.length) {
+                        self.item.idAddressRegion = self.regions[0].id
+                        self.getCities(self.item.idAddressRegion)
+                    }
+                    self.isNew = false
+                    self.update()
+                }
+            })
+        }
+
+        self.getCities = (idRegion) => {
+            API.request({
+                object: 'AtdCity',
+                method: 'Fetch',
+                data: {filters: {field: 'idRegion', value: idRegion }},
+                success(response) {
+                    self.cities = response.items
+                    self.update()
+                }
+            })
+        }
+
+        self.regionChange = (e) => {
+            self.getCities(e.target.value)
+        }
 
         self.on('mount', () => {
+            self.getRegions()
             riot.route.exec()
         })
 

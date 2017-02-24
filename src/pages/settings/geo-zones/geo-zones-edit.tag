@@ -93,6 +93,16 @@ geo-zones-edit
             })
         })
 
+        observable.on('geo-zones-new', () => {
+            self.item = {
+                name: null,
+                regions: []
+            }
+            self.error = false
+            self.loader = false
+            self.update()
+        })
+
         self.submit = e => {
             var params = self.item
             self.error = self.validation.validate(params, self.rules)
