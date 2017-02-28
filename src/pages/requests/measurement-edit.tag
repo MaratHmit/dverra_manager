@@ -2,6 +2,7 @@
 | import 'pages/schedule/schedule-modal.tag'
 | import 'pages/persons/person-new-modal.tag'
 | import 'inputmask'
+| import 'components/select-streets.tag'
 
 measurement-edit
     loader(if='{ loader }')
@@ -64,33 +65,45 @@ measurement-edit
                                         selected='{ id == item.idAddressCity }', no-reorder) { name }
                             .col-md-2
                                 .form-group
-                                    label.control-label Улица
-                                    input.form-control(name='addressStreet', value='{ item.addressStreet }')
+                                    label.control-label { item.addressStreetType ?  item.addressStreetType : 'Улица' }
+                                    select-streets(name='addressStreet', values='{ streets }', value='{ item.addressStreet }',
+                                        oninput='{ handlers.getStreets }', set='{ setStreet }' )
                             .col-md-1
                                 .form-group
                                     label.control-label Дом/строение
-                                    input.form-control(name='addressBuilding', value='{ item.addressBuilding }')
+                                    input.form-control(name='addressBuilding', value='{ item.addressBuilding }',
+                                        onchange='{ geoFix }', disabled='{ !item.addressStreet }')
                             .col-md-1
                                 .form-group
                                     label.control-label Квартира
-                                    input.form-control(name='addressApartment', value='{ item.addressApartment }')
-                            .col-md-4
+                                    input.form-control(name='addressApartment',
+                                        value='{ item.addressApartment }', disabled='{ !item.addressBuilding }')
+                            .col-md-4(if='{ item.idAddressCity == 1 }')
                                 .form-group
-                                    label.control-label Примечание по адресу
-                                    input.form-control(name='addressNote', value='{ item.addressNote }')
+                                    label.control-label Округ
+                                    input.form-control(name='dependent', value='{ item.dependent }', disabled)
             .row
-                .col-md-3
+                .col-md-2
+                    .form-group
+                        label.control-label Район замера
+                        select.form-control(name='idGeoZone', value='{ item.idGeoZone }')
+                            option(each='{ zones }', value='{ id }',
+                            selected='{ id == item.idGeoZone }', no-reorder) { name }
+
+                .col-md-2
                     .form-group
                         label.control-label Дата и время выполнения замера
                         .input-group
                             input.form-control(name='measurementDate',
-                            value='{ item.measurementDate }', readonly)
+                                value='{ item.measurementDate }', readonly)
                             span.input-group-addon(onclick='{ getMeasurementDate }')
                                 i.fa.fa-calendar
-                .col-md-9
+                .col-md-8
                     .form-group
                         label.control-label Примечание по замеру
                         input.form-control(name='note', value='{ item.note }')
+            .row
+                .col-md-12(id="map", style="width: 600px; height: 600px")
 
 
 
@@ -105,12 +118,13 @@ measurement-edit
         self.item = {}
         self.regions = []
         self.cities = []
+        self.streets = []
 
         self.reload = e => {
-            observable.trigger('request-edit', self.item.id)
+            observable.trigger('measurement-edit', self.item.id)
         }
 
-        observable.on('request-edit', id => {
+        observable.on('measurement-edit', id => {
             var params = {id}
             self.error = false
             self.isNew = false
@@ -119,7 +133,7 @@ measurement-edit
             self.update()
 
             API.request({
-                object: 'Request',
+                object: 'Measurement',
                 method: 'Info',
                 data: params,
                 success(response) {
@@ -205,8 +219,10 @@ measurement-edit
         observable.on('measurement-new', () => {
             self.error = false
             self.isNew = true
-            self.item = {sumDelivery: 0, discount: 0, idStatus: 2}
+            self.item = {sumDelivery: 0, discount: 0, idStatus: 2, addressStreet: '', addressBuilding: '' }
             self.item.dateDisplay = (new Date()).toLocaleString()
+            self.getRegions()
+            self.getZones()
             API.request({
                 object: 'Measurement',
                 method: 'Info',
@@ -227,7 +243,17 @@ measurement-edit
                         self.item.idAddressRegion = self.regions[0].id
                         self.getCities(self.item.idAddressRegion)
                     }
-                    self.isNew = false
+                    self.update()
+                }
+            })
+        }
+
+        self.getZones = () => {
+            API.request({
+                object: 'GeoZone',
+                method: 'Fetch',
+                success(response) {
+                    self.zones = response.items
                     self.update()
                 }
             })
@@ -240,18 +266,132 @@ measurement-edit
                 data: {filters: {field: 'idRegion', value: idRegion }},
                 success(response) {
                     self.cities = response.items
+                    if (self.cities.length) {
+                        self.item.idAddressCity = self.cities[0].id
+                        self.getStreets(self.item.idAddressCity)
+                    }
                     self.update()
                 }
             })
         }
 
+        self.getStreets = (idCity) => {
+
+            let zipCode = null
+            self.cities.forEach((city) => {
+                if (city.id == idCity) {
+                    zipCode = city.zipCode
+                    return true
+                }
+            })
+
+            API.request({
+                object: 'AtdStreet',
+                method: 'Fetch',
+                data: { zipCode: zipCode , value: self.item.addressStreet },
+                success(response) {
+                    self.streets = response.items
+                    self.update()
+                }
+            })
+        }
+
+        self.setStreet = (name, type) => {
+            self.item.addressStreet = name
+            self.item.addressStreetType = type
+            self.update()
+        }
+
+        self.geoFix = (e) => {
+
+            self.item.addressBuilding = e.target.value
+            let region = 'Москва'
+            let city = 'Москва'
+
+            self.regions.forEach((item) => {
+                if (item.id == self.item.idAddressRegion) {
+                    region = item.name
+                    return true
+                }
+            })
+
+            self.cities.forEach((item) => {
+                if (item.id == self.item.idAddressCity) {
+                    city = item.name
+                    return true
+                }
+            })
+
+            let address = region + ',+' + city + ',+' + self.item.addressStreet + ',+' +
+                self.item.addressStreetType + ',+дом+' + self.item.addressBuilding
+
+            API.request({
+                object: 'AtdStreet',
+                method: 'Info',
+                data: { value: address, idCity: self.item.idAddressCity },
+                success(response) {
+                   self.item.dependent = response.dependent
+                   self.item.longitude = response.longitude
+                   self.item.latitude = response.latitude
+                   if (!!response.idGeoZone) {
+                       self.item.idGeoZone = response.idGeoZone
+                       let placemark = new ymaps.Placemark([self.item.latitude, self.item.longitude], {
+                           hintContent: 'Замер',
+                           balloonContent: 'Замер'
+                       });
+                       mapYandex.geoObjects.add(placemark);
+                       mapYandex.setCenter([self.item.latitude, self.item.longitude], 12);
+                   }
+
+                   self.update()
+                }
+            })
+        }
+
+        self.handlers = {
+            getStreets(e) {
+                self.item.addressStreet = e.target.value
+                self.getStreets(self.item.idAddressCity)
+            }
+        }
+
         self.regionChange = (e) => {
+            self.cities = []
+            self.streets = []
+            self.item.dependent = null
+            self.item.longitude = null
+            self.item.latitude = null
+            self.item.addressStreet = null
+
+            self.update()
             self.getCities(e.target.value)
         }
 
+        self.cityChange = (e) => {
+
+            self.streets = []
+            self.item.dependent = null
+            self.item.longitude = null
+            self.item.latitude = null
+            self.item.addressStreet = null
+            self.item.idAddressCity = e.target.value
+
+            self.update()
+            self.getStreets(self.item.idAddressCity)
+        }
+
         self.on('mount', () => {
-            self.getRegions()
             riot.route.exec()
         })
+
+        ymaps.ready(init);
+        var mapYandex;
+
+        function init(){
+            mapYandex = new ymaps.Map("map", {
+                center: [55.76, 37.64],
+                zoom: 10
+            });
+        }
 
     

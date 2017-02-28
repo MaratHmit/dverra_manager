@@ -4,7 +4,7 @@
 autocomplete
 	
 	input(class='{ "open": isOpen && !opts.disabled }', type='text', onfocus='{ focus }', oninput='{ filterOptions }',
-	onchange='{ stop }' ,value='{ filterValue }')
+		onchange='{ stop }' ,value='{ filterValue.length ? filterValue : value }')
 	div.results(show='{ isOpen && !opts.disabled }', onchange='return false;')
 		div.text(if='{ parseInt(opts.minSymbols) ? filterValue.length < parseInt(opts.minSymbols) : false }')
 			| Введите не менее { parseInt(opts.minSymbols) } символ{parseInt(opts.minSymbols) == 1 ? 'а' : 'ов' }
@@ -139,6 +139,7 @@ autocomplete
 		
 		self.filterOptions = (e) => {
 			e.stopPropagation()
+
 			if (e.target.value == '') {
 				self.value = undefined
 				var event = document.createEvent('Event')

@@ -63,7 +63,6 @@ measurements-list
 
         observable.on('measurements-reload', function () {
             self.tags.catalog.reload()
-            console.log("fds")
         })
 
 
