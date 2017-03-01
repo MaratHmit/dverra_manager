@@ -51,12 +51,17 @@ geo-zones-edit
             {name: 'area', value: 'Округ'},
         ]
 
+        self.reload = e => {
+            observable.trigger('geo-zones-edit', self.item.id)
+        }
+
         self.addRegion = () => {
             modals.create('geo-zones-region-edit-modal', {
                 type: 'modal-primary',
                 isNew: true,
                 submit() {
                     var _this = this
+                    console.log(_this.item)
                     self.item.regions.push(_this.item)
                     self.update()
                     _this.modalHide()

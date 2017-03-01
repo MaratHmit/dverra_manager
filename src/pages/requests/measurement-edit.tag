@@ -44,7 +44,7 @@ measurement-edit
                 .col-md-3
                     .form-group
                         label.control-label Телефон
-                        input.form-control(name='phone', value='{ item.phone }', readonly)
+                        input.form-control(name='customerPhone', value='{ item.customerPhone }', readonly)
             .row
                 .col-md-12
                     .panel.panel-default
@@ -81,7 +81,7 @@ measurement-edit
                             .col-md-4(if='{ item.idAddressCity == 1 }')
                                 .form-group
                                     label.control-label Округ
-                                    input.form-control(name='dependent', value='{ item.dependent }', disabled)
+                                    input.form-control(name='addressArea', value='{ item.addressArea }', disabled)
             .row
                 .col-md-2
                     .form-group
@@ -94,8 +94,8 @@ measurement-edit
                     .form-group
                         label.control-label Дата и время выполнения замера
                         .input-group
-                            input.form-control(name='measurementDate',
-                                value='{ item.measurementDate }', readonly)
+                            input.form-control(name='serviceDate',
+                                value='{ item.serviceDate }', readonly)
                             span.input-group-addon(onclick='{ getMeasurementDate }')
                                 i.fa.fa-calendar
                 .col-md-8
@@ -125,7 +125,7 @@ measurement-edit
         }
 
         observable.on('measurement-edit', id => {
-            var params = {id}
+            let params = {id}
             self.error = false
             self.isNew = false
             self.item = {}
@@ -140,6 +140,8 @@ measurement-edit
                     self.item = response
                     self.loader = false
                     self.update()
+                    self.getRegions()
+                    self.getZones()
                 }
             })
         })
@@ -155,7 +157,7 @@ measurement-edit
                     self.isNew = false
                     self.update()
                     popups.create({title: 'Успех!', text: 'Изменения сохранены!', style: 'popup-success'})
-                    observable.trigger('requests-reload')
+                    observable.trigger('measurements-reload')
                 }
             })
         }
@@ -169,7 +171,7 @@ measurement-edit
                     if (items.length > 0) {
                         self.item.idUser = items[0].id
                         self.item.customer = items[0].name
-                        self.item.phone = items[0].phone
+                        self.item.customerPhone = items[0].phone
                         self.update()
                         this.modalHide()
                     }
@@ -192,7 +194,7 @@ measurement-edit
                             _this.modalHide()
                             self.item.idUser = response.id
                             self.item.customer = response.name
-                            self.item.phone = response.phone
+                            self.item.customerPhone = response.phone
                             self.update()
                             if (response.isExist) {
                                 modals.create('bs-alert', {
@@ -213,7 +215,6 @@ measurement-edit
                     })
                 }
             })
-            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
         }
 
         observable.on('measurement-new', () => {
@@ -223,6 +224,7 @@ measurement-edit
             self.item.dateDisplay = (new Date()).toLocaleString()
             self.getRegions()
             self.getZones()
+
             API.request({
                 object: 'Measurement',
                 method: 'Info',
@@ -240,7 +242,7 @@ measurement-edit
                 success(response) {
                     self.regions = response.items
                     if (self.regions.length) {
-                        self.item.idAddressRegion = self.regions[0].id
+                        self.item.idAddressRegion = !!self.item.idAddressRegion ? self.item.idAddressRegion : self.regions[0].id
                         self.getCities(self.item.idAddressRegion)
                     }
                     self.update()
@@ -267,7 +269,7 @@ measurement-edit
                 success(response) {
                     self.cities = response.items
                     if (self.cities.length) {
-                        self.item.idAddressCity = self.cities[0].id
+                        self.item.idAddressCity = !!self.item.idAddressCity ? self.item.idAddressCity : self.cities[0].id
                         self.getStreets(self.item.idAddressCity)
                     }
                     self.update()
@@ -330,17 +332,30 @@ measurement-edit
                 method: 'Info',
                 data: { value: address, idCity: self.item.idAddressCity },
                 success(response) {
-                   self.item.dependent = response.dependent
-                   self.item.longitude = response.longitude
-                   self.item.latitude = response.latitude
+                   self.item.addressArea = response.addressArea
+                   self.item.geoLongitude = response.geoLongitude
+                   self.item.geoLatitude = response.geoLatitude
                    if (!!response.idGeoZone) {
                        self.item.idGeoZone = response.idGeoZone
-                       let placemark = new ymaps.Placemark([self.item.latitude, self.item.longitude], {
+                       let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
                            hintContent: 'Замер',
                            balloonContent: 'Замер'
                        });
                        mapYandex.geoObjects.add(placemark);
-                       mapYandex.setCenter([self.item.latitude, self.item.longitude], 12);
+                       mapYandex.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                   } else {
+                       modals.create('bs-alert', {
+                           type: 'modal-danger',
+                           title: 'Предупреждение',
+                           text: 'Внимание! Не удаётся определить район замера автоматически!\nУстановите район замера в ручную!',
+                           size: 'modal-sm',
+                           buttons: [
+                               {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                           ],
+                           callback() {
+                               this.modalHide()
+                           }
+                       })
                    }
 
                    self.update()
@@ -358,9 +373,9 @@ measurement-edit
         self.regionChange = (e) => {
             self.cities = []
             self.streets = []
-            self.item.dependent = null
-            self.item.longitude = null
-            self.item.latitude = null
+            self.item.addressArea = null
+            self.item.geoLongitude = null
+            self.item.geoLatitude = null
             self.item.addressStreet = null
 
             self.update()
@@ -370,14 +385,63 @@ measurement-edit
         self.cityChange = (e) => {
 
             self.streets = []
-            self.item.dependent = null
-            self.item.longitude = null
-            self.item.latitude = null
+            self.item.addressArea = null
+            self.item.geoLongitude = null
+            self.item.geoLatitude = null
             self.item.addressStreet = null
             self.item.idAddressCity = e.target.value
 
             self.update()
             self.getStreets(self.item.idAddressCity)
+        }
+
+        self.getMeasurementDate = () => {
+            if (!self.item.idAddressCity || !self.item.addressStreet) {
+                modals.create('bs-alert', {
+                    type: 'modal-danger',
+                    title: 'Ошибка',
+                    text: 'Внимание! Не задан адрес замера!\nДля выбора даты замера укажите адрес замера!',
+                    size: 'modal-sm',
+                    buttons: [
+                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                    ],
+                    callback() {
+                        this.modalHide()
+                    }
+                })
+                return
+            }
+
+            if (!self.item.idGeoZone) {
+                modals.create('bs-alert', {
+                    type: 'modal-danger',
+                    title: 'Ошибка',
+                    text: 'Внимание! Не задан район замера!\nДля выбора даты замера укажите район замера!',
+                    size: 'modal-sm',
+                    buttons: [
+                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                    ],
+                    callback() {
+                    this.modalHide()
+                    }
+                })
+                return
+            }
+
+
+            modals.create('schedule-modal',{
+                serviceDate: self.item.serviceDate,
+                idSchedule: 2,
+                idGeoZone: self.item.idGeoZone,
+                type: 'modal-primary',
+                size: 'modal-lg',
+                submit() {
+                    let event = this.selectedEvent
+                    self.item.serviceDate = event.date + ' ' + event.time
+                    this.modalHide()
+                    self.update()
+                }
+            })
         }
 
         self.on('mount', () => {

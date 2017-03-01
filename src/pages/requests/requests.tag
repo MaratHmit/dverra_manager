@@ -44,7 +44,7 @@ requests
             self.update()
         })
 
-        route('/requests/measurements/([0-9]+)', (tab, id) => {
+        route('/requests/measurements/([0-9]+)', id => {
             self.edit = true
             self.tab = 'measurements'
             self.update()

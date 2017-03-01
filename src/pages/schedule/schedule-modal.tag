@@ -37,7 +37,8 @@ schedule-modal
             let modal = self.tags['bs-modal']
             let serviceDate = opts.serviceDate
             let params = {
-                idSchedule: opts.idSchedule
+                idSchedule: opts.idSchedule,
+                idGeoZone: opts.idGeoZone,
             }
 
             modal.loader = true

@@ -23,10 +23,11 @@ measurements-list
         #{'yield'}(to="body")
             datatable-cell(name='id') { row.id }
             datatable-cell(name='date') { row.dateDisplay }
-            datatable-cell(name='name') { row.name }
-            datatable-cell(name='phone') { row.phone }
-            datatable-cell(name='geo') { row.geoLocation }
-            datatable-cell(name='ip') { row.ip }
+            datatable-cell(name='customer') { row.customer }
+            datatable-cell(name='customerPhone') { row.customerPhone }
+            datatable-cell(name='serviceDate') { row.serviceDate }
+            datatable-cell(name='serviceAddress') { row.serviceAddress }
+            datatable-cell(name='serviceZone') { row.serviceZone }
             datatable-cell(name='note') { row.note }
             datatable-cell(name='status', class='{ handlers.statuses.colors[row.status]  } ')
                 | { handlers.statuses.text[row.status]  }
@@ -38,7 +39,7 @@ measurements-list
         self.mixin('remove')
         self.collection = 'Measurement'
         self.statuses = []
-        self.statusesMap = { text: ['Новая', 'В работе', 'Завершенная'], colors: ['bg-danger', 'bg-warning', 'bg-success'] }
+        self.statusesMap = { text: ['Новый', 'В работе', 'Завершен'], colors: ['bg-danger', 'bg-warning', 'bg-success'] }
 
         self.handlers = {
             statuses: self.statusesMap
@@ -46,11 +47,12 @@ measurements-list
 
         self.cols = [
             { name: 'id' , value: '#' },
-            { name: 'date' , value: 'Дата' },
-            { name: 'name' , value: 'Имя' },
-            { name: 'phone' , value: 'Телефон' },
-            { name: 'geo' , value: 'ГЕО локация' },
-            { name: 'ip' , value: 'IP адрес' },
+            { name: 'date' , value: 'Дата заказа' },
+            { name: 'customer' , value: 'Заказчик' },
+            { name: 'customerPhone' , value: 'Телефон' },
+            { name: 'serviceDate' , value: 'Дата замера' },
+            { name: 'serviceAddress' , value: 'Адрес замера' },
+            { name: 'serviceZone' , value: 'Район замера' },
             { name: 'note' , value: 'Заметка' },
             { name: 'status' , value: 'Статус' },
         ]
