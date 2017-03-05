@@ -138,6 +138,7 @@ measurement-edit
                 data: params,
                 success(response) {
                     self.item = response
+                    self.setCoordinate()
                     self.loader = false
                     self.update()
                     self.getRegions()
@@ -337,12 +338,7 @@ measurement-edit
                    self.item.geoLatitude = response.geoLatitude
                    if (!!response.idGeoZone) {
                        self.item.idGeoZone = response.idGeoZone
-                       let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
-                           hintContent: 'Замер',
-                           balloonContent: 'Замер'
-                       });
-                       mapYandex.geoObjects.add(placemark);
-                       mapYandex.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                       self.setCoordinate()
                    } else {
                        modals.create('bs-alert', {
                            type: 'modal-danger',
@@ -444,7 +440,20 @@ measurement-edit
             })
         }
 
+        self.setCoordinate = () => {
+            if (mapYandex && self.item.geoLatitude) {
+                mapYandex.geoObjects.removeAll()
+                let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
+                    hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
+                         ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
+                });
+                mapYandex.geoObjects.add(placemark);
+                mapYandex.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+            }
+        }
+
         self.on('mount', () => {
+            console.log("mount")
             riot.route.exec()
         })
 
@@ -456,6 +465,7 @@ measurement-edit
                 center: [55.76, 37.64],
                 zoom: 10
             });
+            self.setCoordinate()
         }
 
     

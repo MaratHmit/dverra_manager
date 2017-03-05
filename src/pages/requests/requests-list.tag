@@ -53,6 +53,45 @@ requests-list
                     let item = selectedRows[0]
                     self.isAllowedStatus = !item.status
                 }
+            },
+            createMeasurement() {
+                let selectedRows = this.tags.datatable.getSelectedRows()
+                if (selectedRows.length > 0) {
+                    let item = selectedRows[0]
+                    if (item.idMeasurement) {
+                        riot.route(`/requests/measurements/${item.idMeasurement}`)
+                    } else {
+                        modals.create('bs-alert', {
+                            type: 'modal-info',
+                            title: 'Информация',
+                            text: 'По данной заявке будет создан замер!',
+                            size: 'modal-sm',
+                            buttons: [
+                                {action: 'cancel', title: 'Отмена', style: 'btn-default'},
+                                {action: 'ok', title: 'Я понял', style: 'btn-success'},
+                            ],
+                            callback(action) {
+                                this.modalHide()
+                                if (action == "ok") {
+                                    let params = {
+                                        request: item
+                                    }
+                                    API.request({
+                                        object: 'Measurement',
+                                        method: 'Save',
+                                        data: params,
+                                        success(response) {
+                                            self.measurement = response
+                                            self.tags.catalog.reload()
+                                            //riot.route(`/requests/measurements/${measurement.id}`)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
+                }
+
             }
         }
 
