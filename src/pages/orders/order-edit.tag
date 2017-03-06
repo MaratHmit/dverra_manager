@@ -75,45 +75,86 @@ order-edit
 
             .row
                 .col-md-12
-                    .h4 Суммы
-                    .row
-                        .col-md-3
-                            .form-group
-                                label.control-label Товаров
-                                input.form-control(value='{ sumProducts.toLocaleString() } ₽', readonly)
-                        .col-md-3
-                            .form-group
-                                label.control-label Услуг
-                                input.form-control(value='{ sumServices.toLocaleString() } ₽', readonly)
-                        .col-md-3
-                            .form-group
-                                label.control-label Скидка
-                                input.form-control(name='discount', type='number',
-                                    value='{ item.discount / 1 }', min='0', step='1')
-                        .col-md-3
-                            .form-group.has-success
-                                label.control-label Итого
-                                input.form-control(value='{ total.toLocaleString() } ₽', readonly)
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Суммы
+                        .panel-body
+                            .col-md-3
+                                .form-group
+                                    label.control-label Товаров
+                                    input.form-control(value='{ sumProducts.toLocaleString() } ₽', readonly)
+                            .col-md-3
+                                .form-group
+                                    label.control-label Услуг
+                                    input.form-control(value='{ sumServices.toLocaleString() } ₽', readonly)
+                            .col-md-3
+                                .form-group
+                                    label.control-label Скидка
+                                    input.form-control(name='discount', type='number',
+                                        value='{ item.discount / 1 }', min='0', step='1')
+                            .col-md-3
+                                .form-group.has-success
+                                    label.control-label Итого
+                                    input.form-control(value='{ total.toLocaleString() } ₽', readonly)
             .row
                 .col-md-12
-                    .h4 Доп. параметры заказа
-                    .row
-                        .col-md-3
-                            .form-group
-                                label.control-label Адрес выполнения услуг
-                                input.form-control(name='serviceAddress', value='{ item.serviceAddress }')
-                        .col-md-3
-                            .form-group
-                                label.control-label Дата и время выполнения услуг
-                                .input-group
-                                    input.form-control(name='serviceDate',
-                                        value='{ item.serviceDate }', readonly)
-                                    span.input-group-addon(onclick='{ getServiceDate }')
-                                        i.fa.fa-calendar
-                        .col-md-6
-                            .form-group
-                                label.control-label Примечание
-                                input.form-control(name='note', value='{ item.note }')
+                    .panel.panel-default
+                        .panel-heading
+                            h4.panel-title Адрес работ
+                        .panel-body
+                            .col-md-2
+                                .form-group
+                                    label.control-label Регион
+                                    select.form-control(name='idAddressRegion', value='{ item.idAddressRegion }', onchange='{ regionChange }')
+                                        option(each='{ regions }', value='{ id }',
+                                        selected='{ id == item.idAddressRegion }', no-reorder) { name }
+                            .col-md-2
+                                .form-group
+                                    label.control-label Город
+                                    select.form-control(name='idAddressCity', value='{ item.idAddressCity }', onchange='{ cityChange }')
+                                        option(each='{ cities }', value='{ id }',
+                                        selected='{ id == item.idAddressCity }', no-reorder) { name }
+                            .col-md-2
+                                .form-group
+                                    label.control-label { item.addressStreetType ?  item.addressStreetType : 'Улица' }
+                                    select-streets(name='addressStreet', values='{ streets }', value='{ item.addressStreet }',
+                                    oninput='{ handlers.getStreets }', set='{ setStreet }' )
+                            .col-md-1
+                                .form-group
+                                    label.control-label Дом/строение
+                                    input.form-control(name='addressBuilding', value='{ item.addressBuilding }',
+                                    onchange='{ geoFix }', disabled='{ !item.addressStreet }')
+                            .col-md-1
+                                .form-group
+                                    label.control-label Квартира
+                                    input.form-control(name='addressApartment',
+                                    value='{ item.addressApartment }', disabled='{ !item.addressBuilding }')
+                            .col-md-4(if='{ item.idAddressCity == 1 }')
+                                .form-group
+                                    label.control-label Округ
+                                    input.form-control(name='addressArea', value='{ item.addressArea }', disabled)
+            .row
+                .col-md-2
+                    .form-group
+                        label.control-label Район работ
+                        select.form-control(name='idGeoZone', value='{ item.idGeoZone }')
+                            option(each='{ zones }', value='{ id }',
+                            selected='{ id == item.idGeoZone }', no-reorder) { name }
+
+                .col-md-2
+                    .form-group
+                        label.control-label Дата и время выполнения замера
+                        .input-group
+                            input.form-control(name='serviceDate',
+                            value='{ item.serviceDate }', readonly)
+                            span.input-group-addon(onclick='{ getMeasurementDate }')
+                                i.fa.fa-calendar
+                .col-md-8
+                    .form-group
+                        label.control-label Примечание по заказу
+                        input.form-control(name='note', value='{ item.note }')
+            .row
+                .col-md-12(id="map", style="width: 600px; height: 600px")
 
 
     script(type='text/babel').
@@ -123,6 +164,9 @@ order-edit
 
         self.isNew = false
         self.item = {}
+        self.regions = []
+        self.cities = []
+        self.streets = []
         self.loader = false
         self.sumProducts = 0
         self.sumServices = 0
@@ -316,6 +360,162 @@ order-edit
             }
         })
 
+        self.getRegions = () => {
+            API.request({
+                object: 'AtdRegion',
+                method: 'Fetch',
+                success(response) {
+                    self.regions = response.items
+                    if (self.regions.length) {
+                        self.item.idAddressRegion = !!self.item.idAddressRegion ? self.item.idAddressRegion : self.regions[0].id
+                        self.getCities(self.item.idAddressRegion)
+                    }
+                    self.update()
+                }
+            })
+        }
+
+        self.getZones = () => {
+            API.request({
+                object: 'GeoZone',
+                method: 'Fetch',
+                success(response) {
+                    self.zones = response.items
+                    self.update()
+                }
+            })
+        }
+
+        self.getCities = (idRegion) => {
+            API.request({
+                object: 'AtdCity',
+                method: 'Fetch',
+                data: {filters: {field: 'idRegion', value: idRegion }},
+                success(response) {
+                    self.cities = response.items
+                    if (self.cities.length) {
+                        self.item.idAddressCity = !!self.item.idAddressCity ? self.item.idAddressCity : self.cities[0].id
+                        self.getStreets(self.item.idAddressCity)
+                    }
+                    self.update()
+                }
+            })
+        }
+
+        self.getStreets = (idCity) => {
+
+            let zipCode = null
+            self.cities.forEach((city) => {
+                if (city.id == idCity) {
+                    zipCode = city.zipCode
+                    return true
+                }
+            })
+
+            API.request({
+                object: 'AtdStreet',
+                method: 'Fetch',
+                data: { zipCode: zipCode , value: self.item.addressStreet },
+                success(response) {
+                    self.streets = response.items
+                    self.update()
+                }
+            })
+        }
+
+        self.setStreet = (name, type) => {
+            self.item.addressStreet = name
+            self.item.addressStreetType = type
+            self.update()
+        }
+
+        self.geoFix = (e) => {
+
+            self.item.addressBuilding = e.target.value
+            let region = 'Москва'
+            let city = 'Москва'
+
+            self.regions.forEach((item) => {
+                if (item.id == self.item.idAddressRegion) {
+                    region = item.name
+                    return true
+                }
+            })
+
+            self.cities.forEach((item) => {
+                if (item.id == self.item.idAddressCity) {
+                    city = item.name
+                    return true
+                }
+            })
+
+            let address = region + ',+' + city + ',+' + self.item.addressStreet + ',+' +
+                self.item.addressStreetType + ',+дом+' + self.item.addressBuilding
+
+            API.request({
+                object: 'AtdStreet',
+                method: 'Info',
+                data: { value: address, idCity: self.item.idAddressCity },
+                success(response) {
+                   self.item.addressArea = response.addressArea
+                   self.item.geoLongitude = response.geoLongitude
+                   self.item.geoLatitude = response.geoLatitude
+                   if (!!response.idGeoZone) {
+                       self.item.idGeoZone = response.idGeoZone
+                       self.setCoordinate()
+                   } else {
+                       modals.create('bs-alert', {
+                           type: 'modal-danger',
+                           title: 'Предупреждение',
+                           text: 'Внимание! Не удаётся определить район замера автоматически!\nУстановите район замера в ручную!',
+                           size: 'modal-sm',
+                           buttons: [
+                               {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                           ],
+                           callback() {
+                               this.modalHide()
+                           }
+                       })
+                   }
+
+                   self.update()
+                }
+            })
+        }
+
+        self.handlers = {
+            getStreets(e) {
+                self.item.addressStreet = e.target.value
+                self.getStreets(self.item.idAddressCity)
+            }
+        }
+
+        self.regionChange = (e) => {
+            self.cities = []
+            self.streets = []
+            self.item.addressArea = null
+            self.item.geoLongitude = null
+            self.item.geoLatitude = null
+            self.item.addressStreet = null
+
+            self.update()
+            self.getCities(e.target.value)
+        }
+
+        self.cityChange = (e) => {
+
+            self.streets = []
+            self.item.addressArea = null
+            self.item.geoLongitude = null
+            self.item.geoLatitude = null
+            self.item.addressStreet = null
+            self.item.idAddressCity = e.target.value
+
+            self.update()
+            self.getStreets(self.item.idAddressCity)
+        }
+
+        
         self.getServiceDate = () => {
             modals.create('schedule-modal',{
                 serviceDate: self.item.serviceDate,
@@ -336,6 +536,9 @@ order-edit
             self.isNew = true
             self.item = {sumDelivery: 0, discount: 0, idStatus: 2}
             self.item.dateDisplay = (new Date()).toLocaleString()
+            self.getRegions()
+            self.getZones()
+
             API.request({
                 object: 'Order',
                 method: 'Info',
@@ -362,6 +565,9 @@ order-edit
                     self.item = response
                     self.loader = false
                     self.update()
+                    self.getRegions()
+                    self.getZones()
+
                 }
             })
         })
@@ -369,3 +575,14 @@ order-edit
         self.on('mount', () => {
             riot.route.exec()
         })
+
+        ymaps.ready(initMapOrder);
+        var mapYandexOrder;
+
+        function initMapOrder(){
+            mapYandexOrder = new ymaps.Map("map", {
+                center: [55.76, 37.64],
+                zoom: 10
+            });
+            self.setCoordinate()
+        }

@@ -83,7 +83,7 @@ requests-list
                                         success(response) {
                                             self.measurement = response
                                             self.tags.catalog.reload()
-                                            //riot.route(`/requests/measurements/${measurement.id}`)
+                                            riot.route(`/requests/measurements/${response.id}`)
                                         }
                                     })
                                 }

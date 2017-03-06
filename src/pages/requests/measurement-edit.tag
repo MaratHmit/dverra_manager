@@ -441,27 +441,26 @@ measurement-edit
         }
 
         self.setCoordinate = () => {
-            if (mapYandex && self.item.geoLatitude) {
-                mapYandex.geoObjects.removeAll()
+            if (mapYandexRequest && self.item.geoLatitude) {
+                mapYandexRequest.geoObjects.removeAll()
                 let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
                     hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
                          ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
                 });
-                mapYandex.geoObjects.add(placemark);
-                mapYandex.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                mapYandexRequest.geoObjects.add(placemark);
+                mapYandexRequest.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
             }
         }
 
-        self.on('mount', () => {
-            console.log("mount")
+        self.on('mount', () => {            
             riot.route.exec()
         })
 
-        ymaps.ready(init);
-        var mapYandex;
+        ymaps.ready(initMapRequest);
+        var mapYandexRequest;
 
-        function init(){
-            mapYandex = new ymaps.Map("map", {
+        function initMapRequest(){
+            mapYandexRequest = new ymaps.Map("map", {
                 center: [55.76, 37.64],
                 zoom: 10
             });
