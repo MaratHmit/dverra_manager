@@ -67,12 +67,12 @@ measurement-edit
                                 .form-group
                                     label.control-label { item.addressStreetType ?  item.addressStreetType : 'Улица' }
                                     select-streets(name='addressStreet', values='{ streets }', value='{ item.addressStreet }',
-                                        oninput='{ handlers.getStreets }', set='{ setStreet }' )
+                                        oninput='{ handlers.getStreets }', set='{ setStreet }', onchange='{ geoFix }' )
                             .col-md-1
                                 .form-group
                                     label.control-label Дом/строение
                                     input.form-control(name='addressBuilding', value='{ item.addressBuilding }',
-                                        onchange='{ geoFix }', disabled='{ !item.addressStreet }')
+                                        onchange='{ buildingChange }', disabled='{ !item.addressStreet }')
                             .col-md-1
                                 .form-group
                                     label.control-label Квартира
@@ -305,9 +305,13 @@ measurement-edit
             self.update()
         }
 
-        self.geoFix = (e) => {
-
+        self.buildingChange = (e) => {
             self.item.addressBuilding = e.target.value
+            self.geoFix()
+        }
+
+        self.geoFix = () => {
+
             let region = 'Москва'
             let city = 'Москва'
 

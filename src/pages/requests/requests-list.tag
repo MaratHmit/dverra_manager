@@ -20,7 +20,7 @@ requests-list
                             option(value='1') В работе
                             option(value='2') Завершенные
         #{'yield'}(to='head')
-            button.btn.btn-warning(if='{ parent.isAllowedStatus }', onclick='{ handlers.createMeasurement }', title='Создать замер', type='button')
+            button.btn.btn-warning(onclick='{ handlers.createMeasurement }', title='Замер', type='button')
                 i.fa.fa-check
                 |  Замер
 
