@@ -118,12 +118,12 @@ order-edit
                                 .form-group
                                     label.control-label { item.addressStreetType ?  item.addressStreetType : 'Улица' }
                                     select-streets(name='addressStreet', values='{ streets }', value='{ item.addressStreet }',
-                                    oninput='{ handlers.getStreets }', set='{ setStreet }' )
+                                    oninput='{ handlers.getStreets }', set='{ setStreet }', onchange='{ geoFix }' )
                             .col-md-1
                                 .form-group
                                     label.control-label Дом/строение
                                     input.form-control(name='addressBuilding', value='{ item.addressBuilding }',
-                                    onchange='{ geoFix }', disabled='{ !item.addressStreet }')
+                                    onchange='{ buildingChange }', disabled='{ !item.addressStreet }')
                             .col-md-1
                                 .form-group
                                     label.control-label Квартира
@@ -429,9 +429,13 @@ order-edit
             self.update()
         }
 
-        self.geoFix = (e) => {
-
+        self.buildingChange = (e) => {
             self.item.addressBuilding = e.target.value
+            self.geoFix()
+        }
+
+        self.geoFix = () => {
+
             let region = 'Москва'
             let city = 'Москва'
 
@@ -451,6 +455,7 @@ order-edit
 
             let address = region + ',+' + city + ',+' + self.item.addressStreet + ',+' +
                 self.item.addressStreetType + ',+дом+' + self.item.addressBuilding
+            console.log(address)
 
             API.request({
                 object: 'AtdStreet',
@@ -563,6 +568,7 @@ order-edit
                 data: params,
                 success(response) {
                     self.item = response
+                    self.setCoordinate()
                     self.loader = false
                     self.update()
                     self.getRegions()
@@ -571,6 +577,19 @@ order-edit
                 }
             })
         })
+
+        self.setCoordinate = () => {
+            if (mapYandexOrder && self.item.geoLatitude) {
+                mapYandexOrder.geoObjects.removeAll()
+                let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
+                    hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
+                        ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
+                });
+                mapYandexOrder.geoObjects.add(placemark);
+                mapYandexOrder.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+            }
+        }
+
 
         self.on('mount', () => {
             riot.route.exec()
