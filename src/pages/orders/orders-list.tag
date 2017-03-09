@@ -32,7 +32,7 @@ orders-list
                     li(onclick='{ handlers.createPKO }', class='{ disabled: !parent.isAllowedPKO }')
                         a(href='#')
                             |  Приходно-кассовый ордер
-                    li(onclick='{ handlers.contract }', class='{ disabled: selectedCount == 0 }')
+                    li(onclick='{ handlers.printContract }', class='{ disabled: selectedCount == 0 }')
                         a(href='#')
                             |  Договор
             button.btn.btn-warning(if='{ parent.isAllowedStatus }', onclick='{ handlers.setStatus }', title='Изменить статус', type='button')
@@ -114,6 +114,19 @@ orders-list
                     }
                 })
                 $("#pko-amount").focus();
+            },
+            printContract() {
+                let rows = this.tags.datatable.getSelectedRows()
+                let item = rows[0]
+                API.request({
+                    object: 'Order',
+                    method: 'Print',
+                    data: item,
+                    success(response) {
+                        if (response.url)
+                            window.open(response.url, '_blank')
+                    }
+                })
             },
             setStatus() {
                 let rows = this.tags.datatable.getSelectedRows()
