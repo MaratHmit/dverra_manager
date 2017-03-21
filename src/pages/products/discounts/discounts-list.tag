@@ -10,8 +10,8 @@ discounts-list
             datatable-cell(name='dateTo') { row.dateTo }
             datatable-cell(name='stepTime') { row.stepTime }ч.
             datatable-cell(name='stepDiscount') { row.stepDiscount }
-            datatable-cell(name='summFrom') { row.sumFrom }
-            datatable-cell(name='summTo') { row.sumTo }
+            datatable-cell(name='sumFrom') { row.sumFrom }
+            datatable-cell(name='sumTo') { row.sumTo }
             datatable-cell(name='countFrom') { row.countFrom }
             datatable-cell(name='countTo') { row.countTo }
             datatable-cell(name='week') { handlers.getListOfDays(row.week) }

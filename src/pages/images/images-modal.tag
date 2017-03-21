@@ -3,7 +3,7 @@ images-modal
         #{'yield'}(to='title')
             .h4.modal-title Картинки
         #{'yield'}(to='body')
-            filemanager
+            filemanager(onSelectImage='{ parent.opts.submit.bind(this) }')
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть
             button(onclick='{ parent.opts.submit.bind(this) }', type='button', class='btn btn-primary btn-embossed') Сохранить

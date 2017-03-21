@@ -47,7 +47,7 @@ filemanager
         ontouchend='{ itemTouchEnd }', class='{ filemanager__file_selected: __selected__ }')
             .filemanager__file-icon(if='{ isDir }')
                 i.fa.fa-folder-o.fa-4x
-            .filemanager__file-icon(if='{ !isDir }', style="background-image: url({ urlPreview })")
+            .filemanager__file-icon(if='{ !isDir }', style="background-image: url('{ urlPreview }')")
             .filemanager__filename(title='{ name }') { name }
 
     .filemanager__status-panel
@@ -141,6 +141,7 @@ filemanager
             let path = self.historyBackward.pop()
             self.historyForward.push(self.path)
             self.path = path
+            localStorage.setItem("imagesPath", self.path)
             self.reload()
         }
 
@@ -149,6 +150,7 @@ filemanager
             let path = self.historyForward.pop()
             self.historyBackward.push(self.path)
             self.path = path
+            localStorage.setItem("imagesPath", self.path)
             self.reload()
         }
 
@@ -164,6 +166,10 @@ filemanager
                 currentClick = 0
                 if (e.item.isDir)
                     self.openFolder(e)
+                else {
+                   if (self.opts.onselectimage)
+                       self.opts.onselectimage()
+                }
             }
 
             if (!e.shiftKey) {
@@ -230,7 +236,8 @@ filemanager
         }
 
         self.higherFolder = () => {
-            if (["", "/"].indexOf(self.path) > - 1) return
+            if (["", "/"].indexOf(self.path) > - 1)
+                return
             let path = self.path.split('/')
             if (path.length > 1 && path[0] === path[1])
                 path.splice(0, 1)
@@ -238,6 +245,7 @@ filemanager
             self.historyBackward.push(self.path)
             self.historyForward = []
             self.path = path.join('/') === '' ? '/' : path.join('/')
+            localStorage.setItem("imagesPath", self.path)
             self.reload()
         }
 
@@ -249,6 +257,7 @@ filemanager
             self.historyBackward.push(self.path)
             self.historyForward = []
             self.path = path.join('/')
+            localStorage.setItem("imagesPath", self.path)
             self.reload()
         }
 
@@ -256,6 +265,7 @@ filemanager
             self.historyBackward.push(self.path)
             self.historyForward = []
             self.path = '/'
+            localStorage.setItem("imagesPath", self.path)
             self.reload()
         }
 
@@ -462,6 +472,9 @@ filemanager
         }
 
         self.on('update', () => {
+            self.path = localStorage.getItem("imagesPath")
+            if (!self.path)
+                self.path = '/'
             self.selectedCount = self.getSelectedItemsCount()
         })
 

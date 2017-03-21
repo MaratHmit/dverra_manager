@@ -48,6 +48,7 @@ product-edit-images
         }
 
         self.catalog = e => {
+           console.log(self.parent)
             modals.create('images-modal', {
                 type: 'modal-primary',
                 size: 'modal-lg',
@@ -58,6 +59,7 @@ product-edit-images
 
                     items.forEach(item => {
                         self.value.push({
+                            alt: self.parent.item.name,
                             imagePath: app.clearRelativeLink(`${path}/${item.name}`),
                             imageUrlPreview: app.getImagePreviewURL(`${path}/${item.name}`)
                         })
