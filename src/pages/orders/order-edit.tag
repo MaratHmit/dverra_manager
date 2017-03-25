@@ -147,7 +147,7 @@ order-edit
                         .input-group
                             input.form-control(name='serviceDate',
                             value='{ item.serviceDate }', readonly)
-                            span.input-group-addon(onclick='{ getMeasurementDate }')
+                            span.input-group-addon(onclick='{ getServiceDate }')
                                 i.fa.fa-calendar
                 .col-md-8
                     .form-group
@@ -522,9 +522,42 @@ order-edit
 
         
         self.getServiceDate = () => {
+            if (!self.item.idAddressCity || !self.item.addressStreet) {
+                modals.create('bs-alert', {
+                   type: 'modal-danger',
+                   title: 'Ошибка',
+                   text: 'Внимание! Не задан адрес замера!\nДля выбора даты замера укажите адрес замера!',
+                   size: 'modal-sm',
+                   buttons: [
+                       {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                   ],
+                   callback() {
+                      this.modalHide()
+                   }
+                })
+                return
+            }
+
+            if (!self.item.idGeoZone) {
+                modals.create('bs-alert', {
+                    type: 'modal-danger',
+                    title: 'Ошибка',
+                    text: 'Внимание! Не задан район замера!\nДля выбора даты замера укажите район замера!',
+                    size: 'modal-sm',
+                    buttons: [
+                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
+                    ],
+                    callback() {
+                        this.modalHide()
+                    }
+                })
+                return
+            }
+
             modals.create('schedule-modal',{
                 serviceDate: self.item.serviceDate,
                 idSchedule: 1,
+                idGeoZone: self.item.idGeoZone,
                 type: 'modal-primary',
                 size: 'modal-lg',
                 submit() {
@@ -532,7 +565,7 @@ order-edit
                     self.item.serviceDate = event.date + ' ' + event.time
                     this.modalHide()
                     self.update()
-                }
+               }
             })
         }
 
@@ -549,6 +582,8 @@ order-edit
                 method: 'Info',
                 success(response) {
                     self.item.num = response.newNum
+                    self.setCoordinate()
+                    mapYandexOrder.setCenter([55.76, 37.64], 10);
                     self.update()
                 }
             })
@@ -579,14 +614,17 @@ order-edit
         })
 
         self.setCoordinate = () => {
-            if (mapYandexOrder && self.item.geoLatitude) {
+            if (mapYandexOrder) {
+                if (mapYandexOrder.geoObjects)
                 mapYandexOrder.geoObjects.removeAll()
-                let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
-                    hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
-                        ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
-                });
-                mapYandexOrder.geoObjects.add(placemark);
-                mapYandexOrder.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                if (self.item.geoLatitude) {
+                    let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
+                        hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
+                            ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
+                    });
+                    mapYandexOrder.geoObjects.add(placemark);
+                    mapYandexOrder.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                }
             }
         }
 

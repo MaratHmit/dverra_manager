@@ -231,6 +231,8 @@ measurement-edit
                 method: 'Info',
                 success(response) {
                     self.item.num = response.newNum
+                    self.setCoordinate()
+                    mapYandexRequest.setCenter([55.76, 37.64], 10);
                     self.update()
                 }
             })
@@ -445,14 +447,17 @@ measurement-edit
         }
 
         self.setCoordinate = () => {
-            if (mapYandexRequest && self.item.geoLatitude) {
-                mapYandexRequest.geoObjects.removeAll()
-                let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
-                    hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
-                         ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
-                });
-                mapYandexRequest.geoObjects.add(placemark);
-                mapYandexRequest.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+            if (mapYandexRequest) {
+                if (mapYandexRequest.geoObjects)
+                    mapYandexRequest.geoObjects.removeAll()
+                if (self.item.geoLatitude) {
+                    let placemark = new ymaps.Placemark([self.item.geoLatitude, self.item.geoLongitude], {
+                        hintContent: self.item.addressStreetType + " " + self.item.addressStreet +
+                             ', дом ' + self.item.addressBuilding + ", " + self.item.addressApartment,
+                    });
+                    mapYandexRequest.geoObjects.add(placemark);
+                    mapYandexRequest.setCenter([self.item.geoLatitude, self.item.geoLongitude], 12);
+                }
             }
         }
 
