@@ -583,7 +583,8 @@ order-edit
                 success(response) {
                     self.item.num = response.newNum
                     self.setCoordinate()
-                    mapYandexOrder.setCenter([55.76, 37.64], 10);
+                    if (mapYandexOrder)
+                        mapYandexOrder.setCenter([55.76, 37.64], 10);
                     self.update()
                 }
             })

@@ -9,7 +9,7 @@ catalog
                 #{'yield'}(from='filters')
 
     .row
-        .col-md-8.col-sm-6.col-xs-12
+        .col-md-6.col-sm-6.col-xs-12
             .form-inline.m-b-2
                 button.btn.btn-primary(if='{ opts.add }', onclick='{ opts.add }', type='button')
                     i.fa.fa-plus
@@ -20,8 +20,8 @@ catalog
                     i.fa.fa-trash { (selectedCount > 1) ? "&nbsp;" : "" }
                     span.badge(if='{ selectedCount > 1 }') { selectedCount }
                 #{'yield'}(from='head')
-        .col-md-4.col-sm-6.col-xs-12
-            form.form-inline.text-right.m-b-2
+        .col-md-6.col-sm-6.col-xs-12
+            form.form-inline.text-right
                 .form-group(if='{ opts.search }')
                     .input-group
                         input.form-control(name='search', type='text', placeholder='Поиск', onkeyup='{ find }')
