@@ -92,7 +92,7 @@ products-list
                 #{'yield'}(to='body')
                     datatable-cell(name='id') { row.id }
                     datatable-cell(name='imageUrlPreview')
-                        img(src='{ row.imageUrlPreview }', alt='', width='32', height='32')
+                        img(src='{ row.imageUrlPreview }', alt='', height='32')
                     datatable-cell(name='enabled')
                         button.btn.btn-default.btn-sm(type='button',
                         onclick='{ handlers.permission(handlers.boolChange, "products", "0010") }',

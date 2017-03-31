@@ -14,7 +14,7 @@ product-edit-images
                             |  Добавить
                 #{'yield'}(to='body')
                     datatable-cell(name='')
-                        img(src!='{ row.imageUrlPreview }', height='64px', width='64px')
+                        img(src!='{ row.imageUrlPreview }', height='64px')
                     datatable-cell(name='')
                         p.form-control-static { row.imagePath }
                         input.form-control(value='{ row.alt }', onchange='{ handlers.imageAltChange }')
@@ -48,7 +48,6 @@ product-edit-images
         }
 
         self.catalog = e => {
-           console.log(self.parent)
             modals.create('images-modal', {
                 type: 'modal-primary',
                 size: 'modal-lg',

@@ -47,7 +47,7 @@ filemanager
         ontouchend='{ itemTouchEnd }', class='{ filemanager__file_selected: __selected__ }')
             .filemanager__file-icon(if='{ isDir }')
                 i.fa.fa-folder-o.fa-4x
-            .filemanager__file-icon(if='{ !isDir }', style="background-image: url('{ urlPreview }')")
+            .filemanager__file-icon(if='{ !isDir }', style="background-image: url('{ urlPreview }'); background-size: contain")
             .filemanager__filename(title='{ name }') { name }
 
     .filemanager__status-panel

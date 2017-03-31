@@ -1,3 +1,5 @@
+| import 'inputmask'
+
 person-new-modal(size='modal-sm')
     bs-modal
         #{'yield'}(to="title")
@@ -35,4 +37,6 @@ person-new-modal(size='modal-sm')
             modal.afterChange = e => {
                 modal.error = modal.validation.validate(modal.item, modal.rules, e.target.name)
             }
+
+            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
         })

@@ -1,4 +1,5 @@
 | import 'components/catalog.tag'
+| import './simple-status-modal.tag'
 
 measurements-list
     catalog(object='Measurement', search='true', sortable='true', cols='{ cols }', handlers='{ handlers }', reload='true',
@@ -20,6 +21,12 @@ measurements-list
                             option(value='1') В работе
                             option(value='2') Завершенные
 
+        #{'yield'}(to='head')
+            button.btn.btn-warning(if='{ parent.isAllowedStatus }',
+                onclick='{ handlers.setStatus }', title='Изменить статус', type='button')
+                i.fa.fa-check
+                |  Статус
+
         #{'yield'}(to="body")
             datatable-cell(name='id') { row.id }
             datatable-cell(name='date') { row.dateDisplay }
@@ -40,9 +47,47 @@ measurements-list
         self.collection = 'Measurement'
         self.statuses = []
         self.statusesMap = { text: ['Новый', 'В работе', 'Завершен'], colors: ['bg-danger', 'bg-warning', 'bg-success'] }
+        self.isAllowedStatus = false
 
         self.handlers = {
-            statuses: self.statusesMap
+            statuses: self.statusesMap,
+            onSelected(selectedRows) {
+                self.isAllowedStatus = false
+                if (selectedRows.length > 0) {
+                    let item = selectedRows[0]
+                    self.isAllowedStatus = (item.status != 2)
+                }
+            },
+            setStatus() {
+                let rows = this.tags.datatable.getSelectedRows()
+                if (!rows.length)
+                     return true
+
+                let item = rows[0]
+                modals.create('simple-status-modal', {
+                    type: 'modal-primary',
+                    status: item.status,
+                    submit() {
+                        let data = this.item
+                        data.id = item.id
+                        let _this = this
+                        if (data.status != item.status) {
+                            API.request({
+                                object: 'Measurement',
+                                method: 'Status',
+                                data: data,
+                                success(response) {
+                                    item.status = data.status
+                                    self.update()
+                                },
+                                complete() {
+                                  _this.modalHide()
+                                }
+                            })
+                        }
+                    }
+                })
+            }
         }
 
         self.cols = [

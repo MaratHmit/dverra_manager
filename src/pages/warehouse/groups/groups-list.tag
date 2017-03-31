@@ -75,6 +75,7 @@ groups-units-list
                             data: params,
                             success(response) {
                                 _this.modalHide()
+                                response.childs = []
                                 childs.push(response)
                                 popups.create({
                                     title: 'Успех!',
