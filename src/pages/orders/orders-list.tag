@@ -189,7 +189,7 @@ orders-list
         ]
 
         self.orderOpen = function (e) {
-            if (e.item.row.status != 'canceled' && e.item.row.status != 'completed')
+           // if (e.item.row.status != 'canceled' && e.item.row.status != 'completed')
                 riot.route(`/orders/${e.item.row.id}`)
         }
 

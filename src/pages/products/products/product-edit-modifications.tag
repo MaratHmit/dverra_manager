@@ -7,6 +7,9 @@ product-edit-modifications
             add='{ opts.add }', dblclick='{ opts.dblclick }')
                 #{'yield'}(to='toolbar')
                     button.btn.btn-primary(if='{ selectedCount }',
+                    type='button', onclick='{ parent.opts.edit }', title='Редактировать')
+                        i.fa.fa-fw.fa-pencil
+                    button.btn.btn-primary(if='{ selectedCount }',
                     type='button', onclick='{ parent.opts.clone }', title='Клонировать')
                         i.fa.fa-fw.fa-clone
                 #{'yield'}(to='body')
