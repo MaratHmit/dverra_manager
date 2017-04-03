@@ -120,7 +120,7 @@ product-edit
                 #product-edit-offers.tab-pane.fade
                     .row: .col-md-12
                         product-edit-modifications(name='offers', value='{ item.offers }', is-unlimited='{ item.isUnlimited }',
-                        add='{ item.idType ? modificationAdd : "" }', dblclick='{ modificationAdd }')
+                        add='{ item.idType ? modificationAdd : "" }', dblclick='{ modificationAdd }', clone='{ offerClone }')
 
                 #product-edit-images.tab-pane.fade
                     product-edit-images(name='images', value='{ item.images }', section='shopprice')
@@ -319,6 +319,29 @@ product-edit
                     if (e && e.item.row)
                         e.item.row = offer
                     else self.item.offers.push(offer)
+                    console.log(offer)
+                    self.update()
+                    this.modalHide()
+                }
+            })
+        }
+
+        self.offerClone = () => {
+            let rows = this.tags["offers"].tags["catalog-static"].tags["datatable"].getSelectedRows()
+            let item = {
+                price: rows[0].price,
+                params: JSON.parse(JSON.stringify(rows[0].params)),
+                units: JSON.parse(JSON.stringify(rows[0].units))
+            }
+            modals.create('product-edit-modifications-add-modal', {
+                type: 'modal-primary',
+                item,
+                idType: self.item.idType,
+                submit() {
+                    let offer = this.item
+                    if (self.item.id)
+                        offer.idProduct = self.item.id
+                    self.item.offers.push(offer)
                     self.update()
                     this.modalHide()
                 }

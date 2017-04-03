@@ -47,8 +47,7 @@ products-types-list
                             success(response) {
                                 popups.create({title: 'Успех!', text: 'Тип продукта сохранен!', style: 'popup-success'})
                                 observable.trigger('products-types-list-reload')
-                                if (!id)
-                                    _this.modalHide()
+                                _this.modalHide()
                             },
                         })
                     }

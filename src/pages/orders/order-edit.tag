@@ -1,6 +1,7 @@
 | import 'components/datetime-picker.tag'
 | import 'pages/settings/delivery/delivery-list-modal.tag'
 | import 'pages/payments/payments-list-modal.tag'
+| import 'pages/products/products/products-list-select-modal.tag'
 | import 'pages/products/products/offers-list-select-modal.tag'
 | import 'pages/products/shop-services/shop-services-list-select-modal.tag'
 | import 'pages/schedule/schedule-modal.tag'
@@ -212,7 +213,7 @@ order-edit
                 this.row[this.opts.name] = e.target.value
             },
             addProducts() {
-                modals.create('offers-list-select-modal', {
+                modals.create('products-list-select-modal', {
                     type: 'modal-primary',
                     size: 'modal-lg',
                     submit() {
@@ -220,7 +221,21 @@ order-edit
                         let items = _this.tags.catalog.tags.datatable.getSelectedRows()
                         self.item.items = self.item.items || []
                         if (items.length > 0) {
-                            let ids = self.item.items.map(item => item.id)
+                            let idsExist = self.item.items.map(item => item.id)
+                            let ids = items.map(item => item.id)
+                            let value = ids.join(",")
+                            let params = { filters: { field: 'idProduct', sign: 'IN', value: value } }
+                            console.log(params)
+                            API.request({
+                                object: 'Offer',
+                                method: 'Fetch',
+                                data: params,
+                                success(response) {
+                                    console.log(response)
+                                }
+                            })
+
+                            /*
                             items.forEach(item => {
                                 if (ids.indexOf(item.id) === -1)
                                     self.item.items.push({...item, count: 1, discount: 0, id: null, idOffer: item.id})
@@ -230,6 +245,7 @@ order-edit
                             let event = document.createEvent('Event')
                             event.initEvent('change', true, true)
                             self.tags.items.root.dispatchEvent(event)
+                            */
                         }
                     }
                 })

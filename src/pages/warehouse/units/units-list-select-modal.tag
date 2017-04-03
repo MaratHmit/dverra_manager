@@ -9,6 +9,7 @@ units-list-select-modal
                         descendants='true')
                 .col-md-9.col-xs-12.col-sm-12
                     catalog(object='Unit', cols='{ parent.cols }', search='true', sortable='true',
+                        dblclick='{ parent.opts.submit.bind(this) }',
                         disable-limit='true', disable-col-select='true', filters='{ categoryFilters }')
                         #{'yield'}(to='body')
                             datatable-cell(name='id') { row.id }

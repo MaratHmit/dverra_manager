@@ -5,6 +5,10 @@ product-edit-modifications
         .col-md-12
             catalog-static(name='{ opts.name }', cols='{ cols }', rows='{ value }', handlers='{ handlers }',
             add='{ opts.add }', dblclick='{ opts.dblclick }')
+                #{'yield'}(to='toolbar')
+                    button.btn.btn-primary(if='{ selectedCount }',
+                    type='button', onclick='{ parent.opts.clone }', title='Клонировать')
+                        i.fa.fa-fw.fa-clone
                 #{'yield'}(to='body')
                     datatable-cell(name='composition')
                         ul.list-unstyled
@@ -142,7 +146,7 @@ product-edit-modifications-add-modal
                 method: 'Info',
                 data: {id: opts.idType},
                 success(response) {
-                    modal.features = response.features.filter(i => i.target == 1)
+                    modal.features = response.features
 
                     if (!modal.item.params.length) {
                         modal.features.forEach(feature => {

@@ -3,7 +3,8 @@ brands-list-select-modal
 		#{'yield'}(to="title")
 			.h4.modal-title Бренды
 		#{'yield'}(to="body")
-			catalog(object='Brand', cols='{ parent.cols }', search='true', reload='true')
+			catalog(object='Brand', cols='{ parent.cols }', search='true', reload='true',
+				dblclick='{ parent.opts.submit.bind(this) }')
 				#{'yield'}(to='body')
 					datatable-cell(name='id') { row.id }
 					datatable-cell(name='name') { row.name }
