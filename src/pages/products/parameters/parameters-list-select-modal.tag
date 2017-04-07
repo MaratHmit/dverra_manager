@@ -4,7 +4,8 @@ parameters-list-select-modal
 			.h4.modal-title Параметры
 		#{'yield'}(to="body")
 			catalog(object='Feature', cols='{ parent.cols }', search='true', add='{ parent.add }', remove='true',
-			handlers='{ parent.handlers }', reload='true', filters='{ parent.opts.filters }')
+			handlers='{ parent.handlers }', reload='true', filters='{ parent.opts.filters }',
+			dblclick='{ parent.opts.submit.bind(this) }')
 				#{'yield'}(to='body')
 					datatable-cell(name='id') { row.id }
 					datatable-cell(name='name') { row.name }

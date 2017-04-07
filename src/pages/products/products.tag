@@ -16,6 +16,8 @@
 | import 'pages/products/products-types/products-types-list.tag'
 | import 'pages/products/labels/labels-list.tag'
 | import 'pages/products/labels/label-edit.tag'
+| import 'pages/products/accessories/accessories-list.tag'
+| import 'pages/products/accessories/accessory-edit.tag'
 
 products
     ul(if='{ !edit }').nav.nav-tabs.m-b-2
@@ -54,8 +56,8 @@ products
         shop-services(if='{ tab == "shop-services" && !edit }')
         shop-service-edit(if='{ tab == "shop-services" && edit }')
 
-        coupons-list(if='{ tab == "coupons" && !edit }')
-        coupon-edit(if='{ tab == "coupons" && edit }')
+        accessories-list(if='{ tab == "accessories" && !edit }')
+        accessory-edit(if='{ tab == "accessories" && edit }')
 
     script(type='text/babel').
         var self = this
@@ -74,6 +76,7 @@ products
             {title: 'Параметры', name: 'parameters', link: 'parameters'},
             {title: 'Скидки', name: 'discounts', link: 'discounts'},
             {title: 'Купоны', name: 'coupons', link: 'coupons'},
+            {title: 'Комплектующие', name: 'accessories', link: 'accessories'},
         ]
 
         var route = riot.route.create()

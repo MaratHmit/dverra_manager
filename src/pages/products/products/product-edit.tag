@@ -44,11 +44,15 @@ product-edit
             .tab-content
                 #product-edit-home.tab-pane.fade.in.active
                     .row
-                        .col-md-6(if='{ !isMulti }')
+                        .col-md-3(if='{ !isMulti }')
                             .form-group(class='{ has-error: error.name }')
                                 label.control-label Наименование
                                 input.form-control(name='name', type='text', value='{ item.name }')
                                 .help-block { error.name }
+                        .col-md-3(if='{ !isMulti }')
+                            .form-group
+                                label.control-label Краткое наименование
+                                input.form-control(name='shortName', type='text', value='{ item.shortName }')
                         .col-md-6
                             .form-group
                                 label Бренд

@@ -3,7 +3,8 @@ persons-list-select-modal
         #{'yield'}(to="title")
             .h4.modal-title Клиенты
         #{'yield'}(to="body")
-            catalog(object='User', cols='{ parent.cols }', search='true', reload='false', disable-col-select='1')
+            catalog(object='User', cols='{ parent.cols }', search='true', reload='false', disable-col-select='1',
+                dblclick='{ parent.opts.submit.bind(this) }')
                 #{'yield'}(to='body')
                     datatable-cell(name='id') { row.id }
                     datatable-cell(name='name') { row.name }

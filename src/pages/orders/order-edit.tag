@@ -46,6 +46,10 @@ order-edit
                             span.input-group-addon(onclick='{ newCustomer }')
                                 i.fa.fa-plus
                         .help-block { error.idUser }
+                .col-md-2
+                    .form-group
+                        label.control-label Телефон заказчика
+                        input.form-control(name='customerPhone', value='{ item.customerPhone }', readonly)
             .row
                 .col-md-12
                     .well.well-sm
@@ -286,6 +290,7 @@ order-edit
                     if (items.length > 0) {
                         self.item.idUser = items[0].id
                         self.item.customer = items[0].name
+                        self.item.customerPhone = items[0].phone
                         self.update()
                         this.modalHide()
                     }
@@ -308,6 +313,7 @@ order-edit
                             _this.modalHide()
                             self.item.idUser = response.id
                             self.item.customer = response.name
+                            self.item.customerPhone = response.phone
                             self.update()
                             if (response.isExist) {
                                 modals.create('bs-alert', {
