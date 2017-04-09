@@ -6,7 +6,7 @@ product-new-modal
             form(onchange='{ change }', onkeyup='{ change }')
                 .form-group(class='{ has-error: error.name }')
                     label.control-label Наименование
-                    input.form-control(name='name', type='text')
+                    input.form-control(name='name', type='text' autofocus)
                     .help-block { error.name }
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть

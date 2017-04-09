@@ -53,7 +53,13 @@ product-edit
                             .form-group
                                 label.control-label Краткое наименование
                                 input.form-control(name='shortName', type='text', value='{ item.shortName }')
-                        .col-md-6
+                        .col-md-3: .form-group
+                            label.control-label Тип товара
+                            select.form-control(name='idType', value='{ item.idType }')
+                                option(value='')
+                                option(each='{ item.productTypes }', value='{ id }',
+                                selected='{ id == item.idType }', no-reorder) { name }
+                        .col-md-3
                             .form-group
                                 label Бренд
                                 .input-group
@@ -69,26 +75,6 @@ product-edit
                                     input.form-control(name='url', value='{ item.url }')
                                     span.input-group-addon(onclick='{ permission(translite, "products", "0010") }')
                                         | Транслитерация
-                        .col-md-6: .form-group
-                            label.control-label Тип товара
-                            select.form-control(name='idType', value='{ item.idType }')
-                                option(value='')
-                                option(each='{ item.productTypes }', value='{ id }',
-                                selected='{ id == item.idType }', no-reorder) { name }
-                    .row
-                        .col-md-3
-                            .form-group(if='{ !item.isUnlimited }')
-                                label.control-label Количество
-                                p.form-control { count || 0 }
-                            .form-group(if='{ item.isUnlimited }')
-                                label.control-label Текст при неогр. кол-ве
-                                input.form-control(name='availableInfo', value='{ item.availableInfo }')
-                        .col-md-3
-                            label.hidden-xs &nbsp;
-                            .checkbox
-                                label
-                                    input(name='isUnlimited', type='checkbox', checked='{ item.isUnlimited }')
-                                    | Неограниченное
                         .col-md-3
                             .form-group
                                 label.control-label Единицы измерения
@@ -100,7 +86,21 @@ product-edit
                             .form-group
                                 label.control-label Шаг количества
                                 input.form-control(name='stepCount', type='number', min='0', step='0.01', value='{ parseFloat(item.stepCount) }')
+                    .row
+                        .col-md-3
+                            .form-group
+                                label.control-label Розн. цена
+                                input.form-control(name='priceRetail', type='number', min='0', step='1', value='{ parseFloat(item.priceRetail ) }')
+                        .col-md-3
+                            .form-group
+                                label.control-label Закуп. цена
+                                input.form-control(name='pricePurchase', type='number', min='0', step='1', value='{ parseFloat(item.pricePurchase ) }')
                     .row: .col-md-12
+                        label.hidden-xs &nbsp;
+                            .checkbox
+                                label
+                                    input(name='isUnlimited', type='checkbox', checked='{ item.isUnlimited }')
+                                    | В наличии
                         .form-group
                             checkbox-list(items='{ item.labels }')
                     .row
@@ -569,6 +569,7 @@ product-edit
             self.isMulti = false
             self.isClone = false
             self.loader = true
+            self.item = {}
             self.update()
 
             getProduct(id, () => {

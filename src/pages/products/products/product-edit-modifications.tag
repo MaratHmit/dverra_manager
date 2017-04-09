@@ -65,10 +65,6 @@ product-edit-modifications
                 {name: 'count', value: 'Кол-во'},
             ]
 
-            if (opts.isUnlimited) {
-                self.initCols[4].hidden = true
-            }
-
             self.root.name = opts.name || ''
             self.newCols = []
 
