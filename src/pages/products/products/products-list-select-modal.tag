@@ -6,7 +6,7 @@ products-list-select-modal
             .row
                 .col-md-3.hidden-xs.hidden-sm
                     catalog-tree(object='Category', label-field='{ "name" }', children-field='{ "childs" }',
-                        reload='true', descendants='true')
+                        reload='true', descendants='true', dblclick='{ parent.opts.submit.bind(this) }')
                 .col-md-9.col-xs-12.col-sm-12
                     catalog(object='Product', disable-col-select='true', cols='{ parent.cols }',
                         filters='{ parent.categoryFilters }', search='true', reload='true', sortable='true',

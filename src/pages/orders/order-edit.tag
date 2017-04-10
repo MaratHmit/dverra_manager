@@ -221,35 +221,58 @@ order-edit
                     type: 'modal-primary',
                     size: 'modal-lg',
                     submit() {
-                        let _this = this
-                        let items = _this.tags.catalog.tags.datatable.getSelectedRows()
-                        self.item.items = self.item.items || []
-                        if (items.length > 0) {
-                            let idsExist = self.item.items.map(item => item.id)
-                            let ids = items.map(item => item.id)
-                            let value = ids.join(",")
+                        let modalProducts = this
+                        let selectedProducts = modalProducts.tags.catalog.tags.datatable.getSelectedRows()                        
+                        self.item.items = self.item.items || []                
+                        if (selectedProducts.length > 0) {
+                            let idsProducts = selectedProducts.map(item => item.id)
+                            let value = idsProducts.join(",")
                             let params = { filters: { field: 'idProduct', sign: 'IN', value: value } }
-                            console.log(params)
                             API.request({
                                 object: 'Offer',
                                 method: 'Fetch',
                                 data: params,
                                 success(response) {
-                                    console.log(response)
+                                    if (response.items.length) {
+                                        modals.create('offers-list-select-modal', {
+                                            type: 'modal-primary',
+                                            size: 'modal-lg',
+                                            offers: response.items,
+                                            submit() {
+                                                let modalOffers = this
+                                                let items = this.tags.offersSelect.tags.datatable.getSelectedRows()
+                                                items.forEach(item => {
+                                                    item.idProduct = item.idProduct
+                                                    item.idOffer = item.id
+                                                    item.id = null
+                                                    self.item.items.push({...item, count: 1, discount: 0 })
+                                                })
+                                                self.update()
+                                                modalProducts.modalHide()
+                                                modalOffers.modalHide()
+                                                let event = document.createEvent('Event')
+                                                event.initEvent('change', true, true)
+                                                self.tags.items.root.dispatchEvent(event)
+                                            }
+                                        })
+                                    } else {
+                                          selectedProducts.forEach(item => {
+                                            item.idProduct = item.id
+                                            item.id = null
+                                            self.item.items.push({...item, count: 1, discount: 0 })
+                                            self.update()
+                                            modalProducts.modalHide()
+                                            let event = document.createEvent('Event')
+                                            event.initEvent('change', true, true)
+                                            self.tags.items.root.dispatchEvent(event)
+                                        })
+                                    }
+                                },
+                                complete() {
+                                    self.update()
+                                    modalProducts.modalHide()
                                 }
                             })
-
-                            /*
-                            items.forEach(item => {
-                                if (ids.indexOf(item.id) === -1)
-                                    self.item.items.push({...item, count: 1, discount: 0, id: null, idOffer: item.id})
-                            })
-                            self.update()
-                            _this.modalHide()
-                            let event = document.createEvent('Event')
-                            event.initEvent('change', true, true)
-                            self.tags.items.root.dispatchEvent(event)
-                            */
                         }
                     }
                 })
@@ -367,7 +390,7 @@ order-edit
         self.on('update', () => {
             if (self.item && self.item.items) {
                 let products = self.item.items.filter(item => {
-                    return item.idOffer > 0
+                    return item.idProduct > 0
                 })
                 let services = self.item.items.filter(item => {
                     return item.idService > 0
@@ -477,7 +500,6 @@ order-edit
 
             let address = region + ',+' + city + ',+' + self.item.addressStreet + ',+' +
                 self.item.addressStreetType + ',+дом+' + self.item.addressBuilding
-            console.log(address)
 
             API.request({
                 object: 'AtdStreet',

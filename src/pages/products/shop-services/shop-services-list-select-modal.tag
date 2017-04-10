@@ -3,7 +3,8 @@ shop-services-list-select-modal
         #{'yield'}(to="title")
             .h4.modal-title Услуги
         #{'yield'}(to="body")
-            catalog(object='ShopService', cols='{ parent.cols }', search='true', reload='true', sortable='true')
+            catalog(object='ShopService', cols='{ parent.cols }', search='true', reload='true',
+                sortable='true', dblclick='{ parent.opts.submit.bind(this) }')
                 #{'yield'}(to='body')
                     datatable-cell(name='id') { row.id }
                     datatable-cell(name='name') { row.name }

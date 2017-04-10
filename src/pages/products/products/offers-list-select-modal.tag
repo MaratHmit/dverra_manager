@@ -1,12 +1,12 @@
 offers-list-select-modal
     bs-modal(size='modal-lg')
         #{'yield'}(to="title")
-            .h4.modal-title Товары
+            .h4.modal-title Торговые предложения
         #{'yield'}(to="body")
             .row
-                    catalog(object='Product', disable-col-select='true', cols='{ parent.cols }',
-                    filters='{ parent.categoryFilters }', search='true', reload='true', sortable='true',
-                    dblclick='{ parent.opts.submit.bind(this) }')
+                .col-md-12
+                    catalog-static(name="offersSelect", cols='{ parent.cols }', rows='{ parent.opts.offers }',
+                        remove-toolbar='true', dblclick='{ parent.opts.submit.bind(this) }')
                         #{'yield'}(to='body')
                             datatable-cell(name='id') { row.id }
                             datatable-cell(name='name') { row.name }
@@ -16,3 +16,12 @@ offers-list-select-modal
             button(onclick='{ parent.opts.submit.bind(this) }', type='button', class='btn btn-primary btn-embossed') Выбрать
 
     script(type='text/babel').
+
+        var self = this
+
+        self.cols = [
+            {name: 'id', value: '#'},
+            {name: 'name', value: 'Наименование'},
+            {name: 'price', value: 'Цена'}
+        ]
+

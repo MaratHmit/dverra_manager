@@ -1,10 +1,10 @@
 | import 'pages/warehouse/units/units-list-select-modal.tag'
 
-product-edit-modifications
+product-edit-offers
     .row
         .col-md-12
             catalog-static(name='{ opts.name }', cols='{ cols }', rows='{ value }', handlers='{ handlers }',
-            add='{ opts.add }', dblclick='{ opts.dblclick }')
+             add='{ opts.add }', dblclick='{ opts.dblclick }')
                 #{'yield'}(to='toolbar')
                     button.btn.btn-primary(if='{ selectedCount }',
                     type='button', onclick='{ parent.opts.edit }', title='Редактировать')
@@ -13,12 +13,12 @@ product-edit-modifications
                     type='button', onclick='{ parent.opts.clone }', title='Клонировать')
                         i.fa.fa-fw.fa-clone
                 #{'yield'}(to='body')
-                    datatable-cell(name='composition')
+                    datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='composition')
                         ul.list-unstyled
                             li(each='{ row.units }') { name }
                     datatable-cell(name='price')
                         input(name='price', value='{ row.price }', readonly='true')
-                    datatable-cell(name='count')
+                    datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='count')
                         input(name='count', value='{ row.count }', readonly='true')
                     datatable-cell(each='{ item, i in parent.parent.parent.newCols }', name='{ item.name }') { row.params[i].value }
 
@@ -59,11 +59,18 @@ product-edit-modifications
         self.on('update', () => {
             self.value = opts.value || []
 
-            self.initCols = [
-                {name: 'composition', value: 'Состав'},
-                {name: 'price', value: 'Цена'},
-                {name: 'count', value: 'Кол-во'},
-            ]
+            if (self.opts.isWarehouse) {
+                self.initCols = [
+                    {name: 'composition', value: 'Состав'},
+                    {name: 'price', value: 'Цена'},
+                    {name: 'count', value: 'Кол-во'},
+                ]
+            }
+            else {
+                self.initCols = [
+                    {name: 'price', value: 'Цена'},
+                ]
+            }
 
             self.root.name = opts.name || ''
             self.newCols = []
@@ -75,6 +82,7 @@ product-edit-modifications
                     return { name: i, value: item.name }
                 })
             }
+
 
             self.cols = [...self.initCols, ...self.newCols]
         })
@@ -91,13 +99,20 @@ product-edit-modifications-add-modal
                         option(each='{ values, i in param.values }', value='{ values.id }',
                             selected='{ handlers.isSelected(param.idFeature, values.id) }') { values.value }
                     .help-block { parent.error[param.id] }
-                label Состав торгового предложения
-                catalog-static(name='units', add='{ addUnit }',
-                    cols='{ unitsCols }', rows='{ item.units }')
-                    #{'yield'}(to='body')
-                        datatable-cell(name='id') { row.id }
-                        datatable-cell(name='name') { row.name }
-                        datatable-cell(name='price') { row.price }
+
+                .form-group(if='{ !isWarehouse }')
+                    label.control-label Закуп. цена
+                    input.form-control(name='pricePurchase', type='number', min='0', step='1', value='{ parseFloat(item.pricePurchase ) }')
+                    label.control-label Рознич. цена
+                    input.form-control(name='priceRetail', type='number', min='0', step='1', value='{ parseFloat(item.priceRetail ) }')
+                .form-group(if='{ isWarehouse }')
+                    label Состав торгового предложения
+                    catalog-static(name='units', add='{ addUnit }', cols='{ unitsCols }', rows='{ item.units }')
+                        #{'yield'}(to='body')
+                            datatable-cell(name='id') { row.id }
+                            datatable-cell(name='name') { row.name }
+                            datatable-cell(name='price') { row.price }
+
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть
             button(onclick='{ submit }', type='button', class='btn btn-primary btn-embossed') Выбрать
@@ -108,6 +123,9 @@ product-edit-modifications-add-modal
         self.on('mount', () => {
             let modal = self.tags['bs-modal']
             modal.item = opts.item
+            modal.isWarehouse = opts.isWarehouse
+            modal.priceRetail = opts.priceRetail
+            modal.pricePurchase = opts.pricePurchase
             modal.mixin('validation')
             modal.mixin('change')
             modal.error = {}
@@ -178,12 +196,14 @@ product-edit-modifications-add-modal
 
             modal.submit = () => {
                 let count = 0, price = 0
-                modal.item.units.forEach(unit => {
-                    count = Math.min(count, unit.count * 1)
-                    price += unit.price * 1
-                })
-                modal.item.count = count
-                modal.item.price = price
+                if (modal.isWarehouse) {
+                    modal.item.units.forEach(unit => {
+                        count = Math.min(count, unit.count * 1)
+                        price += unit.price * 1
+                    })
+                    modal.item.count = count
+                    modal.item.price = price
+                } else modal.item.price = modal.item.priceRetail
                 if (typeof opts.submit === 'function')
                     opts.submit.apply(modal)
             }

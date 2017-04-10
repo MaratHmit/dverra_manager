@@ -3,7 +3,7 @@
 | import 'components/autocomplete.tag'
 | import 'lodash/lodash'
 | import 'pages/products/products/product-edit-images.tag'
-| import 'pages/products/products/product-edit-modifications.tag'
+| import 'pages/products/products/product-edit-offers.tag'
 | import 'pages/products/products/product-edit-parameters.tag'
 | import 'pages/products/products/product-edit-categories.tag'
 | import 'pages/products/products/product-edit-discounts.tag'
@@ -29,7 +29,7 @@ product-edit
         ul.nav.nav-tabs.m-b-2
             li.active: a(data-toggle='tab', href='#product-edit-home') Основная информация
             li: a(data-toggle='tab', href='#product-edit-full-text') Описание
-            li: a(data-toggle='tab', href='#product-edit-offers') Торговые предложения
+            li(if='{ item.isWarehouse || item.isOffer }'): a(data-toggle='tab', href='#product-edit-offers') Торговые предложения
             li: a(data-toggle='tab', href='#product-edit-categories') Разделы
             li: a(data-toggle='tab', href='#product-edit-images') Картинки
             li: a(data-toggle='tab', href='#product-edit-parameters') Характеристики
@@ -86,7 +86,17 @@ product-edit
                             .form-group
                                 label.control-label Шаг количества
                                 input.form-control(name='stepCount', type='number', min='0', step='0.01', value='{ parseFloat(item.stepCount) }')
-                    .row
+                    .row: .col-md-12
+                        .checkbox
+                            label
+                                input(name='isWarehouse', type='checkbox', checked='{ item.isWarehouse }')
+                                | Складская программа
+                    .row: .col-md-12(if='{ !item.isWarehouse }')
+                        .checkbox
+                            label
+                                input(name='isOffer', type='checkbox', checked='{ item.isOffer }')
+                                | Торговые предложения
+                    .row(if='{ !item.isWarehouse }')
                         .col-md-3
                             .form-group
                                 label.control-label Розн. цена
@@ -96,11 +106,10 @@ product-edit
                                 label.control-label Закуп. цена
                                 input.form-control(name='pricePurchase', type='number', min='0', step='1', value='{ parseFloat(item.pricePurchase ) }')
                     .row: .col-md-12
-                        label.hidden-xs &nbsp;
-                            .checkbox
-                                label
-                                    input(name='isUnlimited', type='checkbox', checked='{ item.isUnlimited }')
-                                    | В наличии
+                        .checkbox
+                            label
+                                input(name='isCustom', type='checkbox', checked='{ item.isCustom }')
+                                | Под заказ
                         .form-group
                             checkbox-list(items='{ item.labels }')
                     .row
@@ -121,11 +130,11 @@ product-edit
                             .form-group
                                 label.control-label Полный текст
                                 ckeditor(name='content', value='{ item.content }')
-                #product-edit-offers.tab-pane.fade
+                #product-edit-offers.tab-pane.fade(if='{ item.isWarehouse || item.isOffer }')
                     .row: .col-md-12
-                        product-edit-modifications(name='offers', value='{ item.offers }', is-unlimited='{ item.isUnlimited }',
-                        add='{ item.idType ? modificationAdd : "" }', dblclick='{ modificationAdd }', clone='{ offerClone }',
-                        edit='{ modificationEdit }')
+                        product-edit-offers(name='offers', value='{ item.offers }', is-warehouse='{ item.isWarehouse }',
+                            add='{ item.idType ? modificationAdd : "" }', dblclick='{ modificationAdd }', clone='{ offerClone }',
+                            edit='{ modificationEdit }')
 
                 #product-edit-images.tab-pane.fade
                     product-edit-images(name='images', value='{ item.images }', section='shopprice')
@@ -312,10 +321,16 @@ product-edit
         }
 
         self.modificationAdd = e => {
+            var isWarehouse = self.item.isWarehouse
+            var priceRetail = self.item.priceRetail
+            var pricePurchase = self.item.pricePurchase
             var item = (e && e.item.row) ? e.item.row : {}
             modals.create('product-edit-modifications-add-modal', {
                 type: 'modal-primary',
                 item,
+                isWarehouse,
+                priceRetail,
+                pricePurchase,
                 idType: self.item.idType,
                 submit() {
                     let offer = this.item
