@@ -16,8 +16,12 @@ product-edit-offers
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='composition')
                         ul.list-unstyled
                             li(each='{ row.units }') { name }
-                    datatable-cell(name='price')
-                        input(name='price', value='{ row.price }', readonly='true')
+                    datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='pricePurchase')
+                        input(name='pricePurchase', value='{ row.pricePurchase }', type='number')
+                    datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='priceRetail')
+                        input(name='priceRetail', value='{ row.priceRetail }', type='number')
+                    datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='priceRetail')
+                        input(name='priceRetail', value='{ row.priceRetail }', readonly='true')
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='count')
                         input(name='count', value='{ row.count }', readonly='true')
                     datatable-cell(each='{ item, i in parent.parent.parent.newCols }', name='{ item.name }') { row.params[i].value }
@@ -62,13 +66,14 @@ product-edit-offers
             if (self.opts.isWarehouse) {
                 self.initCols = [
                     {name: 'composition', value: 'Состав'},
-                    {name: 'price', value: 'Цена'},
+                    {name: 'priceRetail', value: 'Розн. цена'},
                     {name: 'count', value: 'Кол-во'},
                 ]
             }
             else {
                 self.initCols = [
-                    {name: 'price', value: 'Цена'},
+                    {name: 'pricePurchase', value: 'Закуп. цена'},
+                    {name: 'priceRetail', value: 'Розн. цена'},
                 ]
             }
 
@@ -124,8 +129,6 @@ product-edit-modifications-add-modal
             let modal = self.tags['bs-modal']
             modal.item = opts.item
             modal.isWarehouse = opts.isWarehouse
-            modal.priceRetail = opts.priceRetail
-            modal.pricePurchase = opts.pricePurchase
             modal.mixin('validation')
             modal.mixin('change')
             modal.error = {}

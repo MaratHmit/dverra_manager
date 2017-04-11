@@ -29,7 +29,7 @@ product-edit
         ul.nav.nav-tabs.m-b-2
             li.active: a(data-toggle='tab', href='#product-edit-home') Основная информация
             li: a(data-toggle='tab', href='#product-edit-full-text') Описание
-            li(if='{ item.isWarehouse || item.isOffer }'): a(data-toggle='tab', href='#product-edit-offers') Торговые предложения
+            li: a(data-toggle='tab', href='#product-edit-offers') Торговые предложения
             li: a(data-toggle='tab', href='#product-edit-categories') Разделы
             li: a(data-toggle='tab', href='#product-edit-images') Картинки
             li: a(data-toggle='tab', href='#product-edit-parameters') Характеристики
@@ -91,11 +91,6 @@ product-edit
                             label
                                 input(name='isWarehouse', type='checkbox', checked='{ item.isWarehouse }')
                                 | Складская программа
-                    .row: .col-md-12(if='{ !item.isWarehouse }')
-                        .checkbox
-                            label
-                                input(name='isOffer', type='checkbox', checked='{ item.isOffer }')
-                                | Торговые предложения
                     .row(if='{ !item.isWarehouse }')
                         .col-md-3
                             .form-group
@@ -130,7 +125,7 @@ product-edit
                             .form-group
                                 label.control-label Полный текст
                                 ckeditor(name='content', value='{ item.content }')
-                #product-edit-offers.tab-pane.fade(if='{ item.isWarehouse || item.isOffer }')
+                #product-edit-offers.tab-pane.fade
                     .row: .col-md-12
                         product-edit-offers(name='offers', value='{ item.offers }', is-warehouse='{ item.isWarehouse }',
                             add='{ item.idType ? modificationAdd : "" }', dblclick='{ modificationAdd }', clone='{ offerClone }',
@@ -322,15 +317,13 @@ product-edit
 
         self.modificationAdd = e => {
             var isWarehouse = self.item.isWarehouse
-            var priceRetail = self.item.priceRetail
-            var pricePurchase = self.item.pricePurchase
             var item = (e && e.item.row) ? e.item.row : {}
+            item["priceRetail"] = self.item.priceRetail
+            item["pricePurchase"] = self.item.pricePurchase
             modals.create('product-edit-modifications-add-modal', {
                 type: 'modal-primary',
                 item,
                 isWarehouse,
-                priceRetail,
-                pricePurchase,
                 idType: self.item.idType,
                 submit() {
                     let offer = this.item

@@ -35,7 +35,7 @@ unit-edit
                 .col-md-4
                     .form-group
                         label.control-label Розничная цена
-                        input.form-control(name='price', type='number', value='{ item.price }')
+                        input.form-control(name='priceRetail', type='number', value='{ item.priceRetail }')
             .row
                 .col-md-4
                     .form-group

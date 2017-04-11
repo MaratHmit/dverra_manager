@@ -15,8 +15,8 @@ units-list-select-modal
                             datatable-cell(name='id') { row.id }
                             datatable-cell(name='code') { row.code }
                             datatable-cell(name='name') { row.name }
-                            datatable-cell(name='price')
-                                span { (row.price / 1).toLocaleString() } ₽
+                            datatable-cell(name='priceRetail')
+                                span { (row.priceRetail / 1).toLocaleString() } ₽
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть
             button(onclick='{ parent.opts.submit.bind(this) }', type='button', class='btn btn-primary btn-embossed') Выбрать
@@ -28,7 +28,7 @@ units-list-select-modal
             {name: 'id', value: '#'},
             {name: 'code', value: 'Код'},
             {name: 'name', value: 'Наименование'},
-            {name: 'price', value: 'Цена'},
+            {name: 'priceRetail', value: 'Розн. цена'},
         ]
 
         self.on('mount', () => {
