@@ -57,6 +57,10 @@ products-list
                                     i.fa.fa-fw.fa-eye
                                     |  Видимость (вкл/выкл)
                             li.divider
+                            li(onclick='{ handlers.addCategory }')
+                                a(href='#')
+                                    i.fa.fa-fw
+                                    |  Добавить категорию
                             li(onclick='{ handlers.setCategory }')
                                 a(href='#')
                                     i.fa.fa-fw
@@ -239,7 +243,7 @@ products-list
                         let items = this.tags['catalog-tree'].tags.treeview.getSelectedNodes()
 
                         if (items.length > 0) {
-                            let params = { ids, idGroup: items[0].id }
+                            let params = { ids, idGroup: items[0].id, method: "set" }
 
                             API.request({
                                 object: 'Product',
@@ -247,6 +251,32 @@ products-list
                                 data: params,
                                 success(response) {
                                     self.tags.catalog.reload()
+                                }
+                            })
+
+                            self.update()
+                            this.modalHide()
+                        }
+                    }
+                })
+            },
+            addCategory() {
+                let ids = this.tags.datatable.getSelectedRows().map(item => item.id)
+
+                modals.create('group-select-modal', {
+                    type: 'modal-primary',
+                    submit() {
+                        let items = this.tags['catalog-tree'].tags.treeview.getSelectedNodes()
+
+                        if (items.length > 0) {
+                            let params = { ids, idGroup: items[0].id, method: "add" }
+
+                            API.request({
+                                object: 'Product',
+                                method: 'Save',
+                                data: params,
+                                success() {
+                                   popups.create({title: 'Успех!', text: 'Изменения сохранены!', style: 'popup-success'})
                                 }
                             })
 
