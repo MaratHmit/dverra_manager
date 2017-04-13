@@ -253,7 +253,6 @@ products-list
                                     self.tags.catalog.reload()
                                 }
                             })
-
                             self.update()
                             this.modalHide()
                         }
