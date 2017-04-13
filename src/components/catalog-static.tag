@@ -46,7 +46,7 @@ catalog-static
         self.pages = {
             count: 0,
             current: 1,
-            limit: 15,
+            limit: 100,
             change(e) {
                 self.pages.current = e.currentTarget.page
             }
