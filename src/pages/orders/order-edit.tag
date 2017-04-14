@@ -57,14 +57,16 @@ order-edit
                         handlers='{ itemsHandlers }')
                             #{'yield'}(to='toolbar')
                                 .form-group
+                                    button.btn.btn-primary(type='button', onclick='{ opts.handlers.addItem }')
+                                        i.fa.fa-plus
                                     button.btn.btn-primary(type='button', onclick='{ opts.handlers.addProducts }')
-                                        i.fa.fa-plus
-                                        |  Добавить товар
+                                        |  Справочник товаров
                                     button.btn.btn-primary(type='button', onclick='{ opts.handlers.addServices }')
-                                        i.fa.fa-plus
-                                        |  Добавить услугу
+                                        |  Справочник услуг
                             #{'yield'}(to='body')
-                                datatable-cell(name='name') { row.name }
+                                datatable-cell(name='name')
+                                    input(if='{ row.idService || row.idProduct }'  value='{ row.name }', type='text', readonly)
+                                    input(if='{ !row.idService && !row.idProduct }'  value='{ row.name }', type='text')
                                 datatable-cell(name='count')
                                     input(value='{ row.count }', type='number', step='1', min='1',
                                     onchange='{ handlers.numberChange }')
@@ -216,6 +218,14 @@ order-edit
             numberChange(e) {
                 this.row[this.opts.name] = e.target.value
             },
+            addItem() {
+                self.item.items = self.item.items || []
+                self.item.items.push({count: 1, discount: 0, id: null, price:0, amount:0})
+                self.update()
+                let event = document.createEvent('Event')
+                event.initEvent('change', true, true)
+                self.tags.items.root.dispatchEvent(event)
+            },
             addProducts() {
                 modals.create('products-list-select-modal', {
                     type: 'modal-primary',
@@ -244,6 +254,7 @@ order-edit
                                                 items.forEach(item => {
                                                     item.idProduct = item.idProduct
                                                     item.idOffer = item.id
+                                                    item.price = item.priceRetail
                                                     item.id = null
                                                     self.item.items.push({...item, count: 1, discount: 0 })
                                                 })

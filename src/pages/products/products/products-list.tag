@@ -380,7 +380,7 @@ products-list
                     submit() {
                         let items = this.tags.catalog.tags.datatable.getSelectedRows()
 
-                        let params = { ids, brand: { id: items[0].id, name: items[0].name }}
+                        let params = { ids, idBrand: items[0].id }
 
                         API.request({
                             object: 'Product',
