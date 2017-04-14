@@ -109,6 +109,7 @@ products-list
                     datatable-cell(name='nameBrand') { row.nameBrand }
                     datatable-cell(name='price')
                         span { (row.price / 1).toLocaleString() } ₽
+                    datatable-cell(name='sort') { row.sort }
                     datatable-cell(name='nameGroup') { row.nameGroup }
 
     style(scoped).
@@ -170,6 +171,7 @@ products-list
             { name: 'name', value: 'Наименование'},
             { name: 'nameBrand', value: 'Бренд'},
             { name: 'price', value: 'Мин. цена'},
+            { name: 'sort', value: 'Поз.'},
             { name: 'nameGroup', value: 'Группа'},
         ]
 
@@ -279,6 +281,31 @@ products-list
                                 }
                             })
 
+                            self.update()
+                            this.modalHide()
+                        }
+                    }
+                })
+            },
+            addCategory() {
+                let ids = this.tags.datatable.getSelectedRows().map(item => item.id)
+
+                modals.create('group-select-modal', {
+                    type: 'modal-primary',
+                    submit() {
+                        let items = this.tags['catalog-tree'].tags.treeview.getSelectedNodes()
+
+                        if (items.length > 0) {
+                            let params = { ids, idGroup: items[0].id, method: "add" }
+
+                            API.request({
+                                object: 'Product',
+                                method: 'Save',
+                                data: params,
+                                success() {
+                                    popups.create({title: 'Успех!', text: 'Изменения сохранены!', style: 'popup-success'})
+                                }
+                            })
                             self.update()
                             this.modalHide()
                         }

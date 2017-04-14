@@ -6,7 +6,7 @@ group-select-modal
             .h4.modal-title Категории
         #{'yield'}(to="body")
            catalog-tree(object='Category', add='{ add }', label-field='{ "name" }', children-field='{ "childs" }',
-           handlers='{ handlers }', reload='true', search='true')
+           handlers='{ handlers }', reload='true', search='true', dblclick='{ parent.opts.submit.bind(this) }')
                #{'yield'}(to='after')
                    span { this[parent.childrenField].length ? "[" + this[parent.childrenField].length + "]" : "" }
         #{'yield'}(to='footer')
