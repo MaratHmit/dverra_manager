@@ -19,7 +19,7 @@ product-edit-offers
                     datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='pricePurchase')
                         input(name='pricePurchase', value='{ row.pricePurchase }', type='number')
                     datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='priceRetail')
-                        input(name='priceRetail', value='{ row.priceRetail }', type='number')
+                        input(name='priceRetail', value='{ row.priceRetail }', type='number', onchange='{ handlers.changePrice }')
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='priceRetail')
                         input(name='priceRetail', value='{ row.priceRetail }', readonly='true')
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='count')
@@ -57,8 +57,15 @@ product-edit-offers
                     e.target.selectionStart = selectionStart
                     e.target.selectionEnd = selectionEnd
                 }
+            },
+            changePrice(e) {
+                if (e.target.name == "priceRetail")
+                    e.item.row.priceRetail = e.target.value
+                if (e.target.name == "pricePurchase")
+                    e.item.row.pricePurchase = e.target.value
             }
         }
+
 
         self.on('update', () => {
             self.value = opts.value || []
