@@ -105,7 +105,7 @@ products-list
                         disabled='{ !handlers.checkPermission("products", "0010") }')
                             i(class='fa { row.isActive ? "fa-eye" : "fa-eye-slash text-muted" } ')
                     datatable-cell(name='article') { row.article }
-                    datatable-cell(name='name') { row.name }
+                    datatable-cell(name='name') { row.title }
                     datatable-cell(name='nameBrand') { row.nameBrand }
                     datatable-cell(name='price')
                         span { (row.price / 1).toLocaleString() } ₽

@@ -51,8 +51,8 @@ product-edit
                                 .help-block { error.name }
                         .col-md-3(if='{ !isMulti }')
                             .form-group
-                                label.control-label Краткое наименование
-                                input.form-control(name='shortName', type='text', value='{ item.shortName }')
+                                label.control-label Подробное наименование
+                                input.form-control(name='fullName', type='text', value='{ item.fullName }')
                         .col-md-3: .form-group
                             label.control-label Тип товара
                             select.form-control(name='idType', value='{ item.idType }')

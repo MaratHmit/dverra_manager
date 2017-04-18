@@ -65,8 +65,9 @@ order-edit
                                         |  Справочник услуг
                             #{'yield'}(to='body')
                                 datatable-cell(name='name')
-                                    input(if='{ row.idService || row.idProduct }'  value='{ row.name }', type='text', readonly)
-                                    input(if='{ !row.idService && !row.idProduct }'  value='{ row.name }', type='text')
+                                    span(if='{ row.idService || row.idProduct }') { row.name }
+                                    input(if='{ !row.idService && !row.idProduct }'  value='{ row.name }', type='text',
+                                        onchange='{ handlers.textChange }')
                                 datatable-cell(name='count')
                                     input(value='{ row.count }', type='number', step='1', min='1',
                                     onchange='{ handlers.numberChange }')
@@ -216,6 +217,9 @@ order-edit
 
         self.itemsHandlers = {
             numberChange(e) {
+                this.row[this.opts.name] = e.target.value
+            },
+            textChange(e) {
                 this.row[this.opts.name] = e.target.value
             },
             addItem() {
