@@ -408,7 +408,7 @@ order-edit
                     return item.idProduct > 0
                 })
                 let services = self.item.items.filter(item => {
-                    return item.idService > 0
+                    return !item.idProduct
                 })
                 self.sumProducts = products.map(i => i.count * i.price - i.discount).reduce((sum, current) => sum + current, 0)
                 self.sumServices = services.map(i => i.count * i.price - i.discount).reduce((sum, current) => sum + current, 0)
