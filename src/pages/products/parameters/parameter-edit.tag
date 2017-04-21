@@ -18,24 +18,28 @@ parameter-edit
         .tab-content
             form(action='', onchange='{ change }', onkeyup='{ change }', method='POST')
                 .row
-                    .col-md-3
+                    .col-md-2
                         .form-group(class='{ has-error: error.name }')
                             label.control-label Наименование
                             input.form-control(name='name', type='text', value='{ item.name }')
                             .help-block { error.name }
-                    .col-md-3
+                    .col-md-2
+                        .form-group
+                            label.control-label Тех. наименование
+                            input.form-control(name='note', type='text', value='{ item.note }')
+                    .col-md-2
                         .form-group
                             label.control-label Назначение
                             select.form-control(name='target', value='{ item.target }')
                                 option(value=0) Характеристика
                                 option(value=1) Модификация
-                    .col-md-3
+                    .col-md-2
                         .form-group(class='{ has-error: error.type }')
                             label.control-label Тип переменной
                             select.form-control(name='type', value='{ item.type }', disabled='{ item.target == 1 }')
                                 option(each='{ feature, i in featuresTypes }', value='{ feature.code }') { feature.name }
                             .help-block { error.type }
-                    .col-md-3
+                    .col-md-2
                         .form-group
                             label.control-label Единицы измерения
                             select.form-control(name='idMeasure', value='{ item.idMeasure }')
@@ -58,13 +62,6 @@ parameter-edit
                                 style='min-width: 100%; max-width: 100%;', value='{ item.description }')
             .row(if='{ listTypes.indexOf(item.type) !== -1 }')
                 .col-md-12
-                    //catalog-static(rows='{ featureValues }', cols='{ featuresValuesCols }',
-                    //dblclick='{ editFeatureValue }', add='{ addFeatureValue }')
-                        #{'yield'}(to='body')
-                            datatable-cell(name='id') { row.id }
-                            datatable-cell(name='name')
-                                i.color(if='{ parent.parent.parent.parent.item.valueType === "CL" }', style='background-color: \#{ row.color };')
-                                | { row.name }
                     .form-group
                         label.control-label Список значений параметра
                         br
@@ -76,17 +73,15 @@ parameter-edit
                             span.badge(if='{ featuresSelectedCount > 1 }') { featuresSelectedCount }
 
                     datatable(name='features', cols='{ featuresValuesCols }', rows='{ item.values }',
-                    dblclick='{ editFeatureValue }', reorder='true')
+                        dblclick='{ editFeatureValue }', reorder='true')
+                        datatable-cell(name='id') { row.id }
+                        datatable-cell(name='image')
+                            img(src='{ row.imageUrlPreview }', alt='', height='32')
                         datatable-cell(name='value')
                             i.color(if='{ parent.parent.parent.item.type === "colorlist" }', style='background-color: \#{ row.color };')
                             | { row.value }
-            //.row
-                .col-md-12
-                    .form-group
-                        .checkbox
-                            label
-                                input(type='checkbox', name='isYAMarket', checked='{ item.isYAMarket }')
-                                | Яндекс.Маркет
+                        datatable-cell(name='sort') { row.sort }
+
 
     style(scoped).
         .color {
@@ -126,8 +121,10 @@ parameter-edit
         }
 
         self.featuresValuesCols = [
-            //{name: 'id', value: '#'},
-            {name: 'name', value: 'Наименование'},
+            {name: 'id', value: '#'},
+            {name: 'image', value: 'Иконка'},
+            {name: 'value', value: 'Наименование'},
+            {name: 'sort', value: 'Позиция'},
         ]
 
         self.submit = e => {
@@ -165,11 +162,15 @@ parameter-edit
                     if (!_this.error) {
                         params.idFeature = self.item.id
                         params.value = _this.item.value
+                        if (_this.item.imagePath) {
+                            params.imageUrlPreview = app.getImageUrl(_this.item.imagePath)
+                            params.imagePath = _this.item.imagePath
+                        }
 
                         if (_this.item.color)
                             params.color = _this.item.color
 
-                        self.item.values = [...self.item.values, params]
+                        self.item.values = [params, ...self.item.values]
                         self.update()
                         this.modalHide()
                     }
@@ -183,6 +184,8 @@ parameter-edit
                 type: 'modal-primary',
                 color: self.item.type === 'colorlist',
                 submit() {
+                    if (this.item.imagePath)
+                        this.item.imageUrlPreview = app.getImageUrl(this.item.imagePath)
                     e.item.row = this.item
                     self.update()
                     this.modalHide()

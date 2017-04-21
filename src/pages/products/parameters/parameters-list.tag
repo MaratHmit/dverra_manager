@@ -2,13 +2,16 @@
 | import 'pages/products/parameters/parameter-new-modal.tag'
 
 parameters-list
-    catalog(object='Feature', cols='{ cols }', search='true', reorder='true', handlers='{ handlers }', reload='true', store='parameters-list',
-    add='{ permission(add, "products", "0100") }',
-    remove='{ permission(remove, "products", "0001") }',
-    dblclick='{ permission(parameterOpen, "products", "1000") }')
+    catalog(object='Feature', cols='{ cols }', search='true', reorder='true', sortable='true',
+        handlers='{ handlers }', reload='true', store='parameters-list',
+        add='{ permission(add, "products", "0100") }',
+        remove='{ permission(remove, "products", "0001") }',
+        dblclick='{ permission(parameterOpen, "products", "1000") }')
         #{'yield'}(to='body')
             datatable-cell(name='id') { row.id }
             datatable-cell(name='name') { row.name }
+            datatable-cell(name='note') { row.note }
+            datatable-cell(name='description') { row.description }
             datatable-cell(name='measure') { row.measure }
             datatable-cell(name='type') { handlers.featureName(row.type) }
             datatable-cell(name='target') { row.target ? 'Модификация' : 'Характеристика' }
@@ -69,11 +72,13 @@ parameters-list
 
         self.cols = [
             {name: 'id', value: '#'},
-            {name: 'name', value: 'Наименование'},
+            {name: 'name', value: 'Имя в фильтре'},
+            {name: 'note', value: 'Техн. наименование'},
+            {name: 'description', value: 'Описание'},
             {name: 'measure', value: 'Ед. изм.'},
             {name: 'type', value: 'Тип параметра'},
             {name: 'target', value: 'Назначение'},
-            {name: 'sort', value: 'Индекс'},
+            {name: 'sort', value: 'Позиция'},
             {name: 'nameGroup', value: 'Группа параметра'},
         ]
 

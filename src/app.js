@@ -106,8 +106,8 @@ app.restoreSession = user => {
 app.clearLink = function (link) {
     let result = link
 
-    if (!/^https?:/.test(result))
-        result = `http://{$result}`
+    //if (!/^http(s)?:/.test(result))
+      //  result = `http://{$result}`
 
     result = result.replace(/(\/){2,}/g, '/').replace(/(http(s){0,1}:)/, '$1/')
     return result
