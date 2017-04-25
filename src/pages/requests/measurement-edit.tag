@@ -46,57 +46,27 @@ measurement-edit
                         label.control-label Телефон
                         input.form-control(name='customerPhone', value='{ item.customerPhone }', readonly)
             .row
-                .col-md-12
-                    .panel.panel-default
-                        .panel-heading
-                            h4.panel-title Адрес замера
-                        .panel-body
-                            .col-md-2
-                                .form-group
-                                    label.control-label Регион
-                                    select.form-control(name='idAddressRegion', value='{ item.idAddressRegion }', onchange='{ regionChange }')
-                                        option(each='{ regions }', value='{ id }',
-                                            selected='{ id == item.idAddressRegion }', no-reorder) { name }
-                            .col-md-2
-                                .form-group
-                                    label.control-label Город
-                                    select.form-control(name='idAddressCity', value='{ item.idAddressCity }', onchange='{ cityChange }')
-                                        option(each='{ cities }', value='{ id }',
-                                        selected='{ id == item.idAddressCity }', no-reorder) { name }
-                            .col-md-2
-                                .form-group
-                                    label.control-label { item.addressStreetType ?  item.addressStreetType : 'Улица' }
-                                    select-streets(name='addressStreet', values='{ streets }', value='{ item.addressStreet }',
-                                        oninput='{ handlers.getStreets }', set='{ setStreet }', onchange='{ geoFix }' )
-                            .col-md-1
-                                .form-group
-                                    label.control-label Дом/строение
-                                    input.form-control(name='addressBuilding', value='{ item.addressBuilding }',
-                                        onchange='{ buildingChange }', disabled='{ !item.addressStreet }')
-                            .col-md-1
-                                .form-group
-                                    label.control-label Квартира
-                                    input.form-control(name='addressApartment',
-                                        value='{ item.addressApartment }', disabled='{ !item.addressBuilding }')
-                            .col-md-4(if='{ item.idAddressCity == 1 }')
-                                .form-group
-                                    label.control-label Округ
-                                    input.form-control(name='addressArea', value='{ item.addressArea }', disabled)
+                .col-md-9
+                    .form-group
+                        label.control-label Адрес замера
+                        input.form-control(name='address', value='{ item.address }',
+                            onchange='{ geoFix }')
             .row
                 .col-md-2
                     .form-group
                         label.control-label Район замера
                         select.form-control(name='idGeoZone', value='{ item.idGeoZone }')
+                            option(value='', selected='{ !item.idGeoZone }', no-reorder) Не выбран
                             option(each='{ zones }', value='{ id }',
                             selected='{ id == item.idGeoZone }', no-reorder) { name }
 
                 .col-md-2
                     .form-group
-                        label.control-label Дата и время выполнения замера
+                        label.control-label Дата/время замера
                         .input-group
                             input.form-control(name='serviceDate',
                                 value='{ item.serviceDate }', readonly)
-                            span.input-group-addon(onclick='{ getMeasurementDate }')
+                            span.input-group-addon(if='{ item.idGeoZone }' onclick='{ getMeasurementDate }')
                                 i.fa.fa-calendar
                 .col-md-8
                     .form-group
@@ -141,7 +111,6 @@ measurement-edit
                     self.setCoordinate()
                     self.loader = false
                     self.update()
-                    self.getRegions()
                     self.getZones()
                 }
             })
@@ -223,8 +192,6 @@ measurement-edit
             self.isNew = true
             self.item = {sumDelivery: 0, discount: 0, idStatus: 2, addressStreet: '', addressBuilding: '' }
             self.item.dateDisplay = (new Date()).toLocaleString()
-            self.getRegions()
-            self.getZones()
 
             API.request({
                 object: 'Measurement',
@@ -234,24 +201,10 @@ measurement-edit
                     self.setCoordinate()
                     mapYandexRequest.setCenter([55.76, 37.64], 10);
                     self.update()
+                    self.getZones()
                 }
             })
         })
-
-        self.getRegions = () => {
-            API.request({
-                object: 'AtdRegion',
-                method: 'Fetch',
-                success(response) {
-                    self.regions = response.items
-                    if (self.regions.length) {
-                        self.item.idAddressRegion = !!self.item.idAddressRegion ? self.item.idAddressRegion : self.regions[0].id
-                        self.getCities(self.item.idAddressRegion)
-                    }
-                    self.update()
-                }
-            })
-        }
 
         self.getZones = () => {
             API.request({
@@ -264,155 +217,26 @@ measurement-edit
             })
         }
 
-        self.getCities = (idRegion) => {
-            API.request({
-                object: 'AtdCity',
-                method: 'Fetch',
-                data: {filters: {field: 'idRegion', value: idRegion }},
-                success(response) {
-                    self.cities = response.items
-                    if (self.cities.length) {
-                        self.item.idAddressCity = !!self.item.idAddressCity ? self.item.idAddressCity : self.cities[0].id
-                        self.getStreets(self.item.idAddressCity)
-                    }
-                    self.update()
-                }
-            })
-        }
-
-        self.getStreets = (idCity) => {
-
-            let zipCode = null
-            self.cities.forEach((city) => {
-                if (city.id == idCity) {
-                    zipCode = city.zipCode
-                    return true
-                }
-            })
-
-            API.request({
-                object: 'AtdStreet',
-                method: 'Fetch',
-                data: { zipCode: zipCode , value: self.item.addressStreet },
-                success(response) {
-                    self.streets = response.items
-                    self.update()
-                }
-            })
-        }
-
-        self.setStreet = (name, type) => {
-            self.item.addressStreet = name
-            self.item.addressStreetType = type
-            self.update()
-        }
-
-        self.buildingChange = (e) => {
-            self.item.addressBuilding = e.target.value
-            self.geoFix()
-        }
 
         self.geoFix = () => {
 
-            let region = 'Москва'
-            let city = 'Москва'
-
-            self.regions.forEach((item) => {
-                if (item.id == self.item.idAddressRegion) {
-                    region = item.name
-                    return true
-                }
-            })
-
-            self.cities.forEach((item) => {
-                if (item.id == self.item.idAddressCity) {
-                    city = item.name
-                    return true
-                }
-            })
-
-            let address = region + ',+' + city + ',+' + self.item.addressStreet + ',+' +
-                self.item.addressStreetType + ',+дом+' + self.item.addressBuilding
+            let address = self.item.address
 
             API.request({
                 object: 'AtdStreet',
                 method: 'Info',
-                data: { value: address, idCity: self.item.idAddressCity },
+                data: { value: address },
                 success(response) {
-                   self.item.addressArea = response.addressArea
                    self.item.geoLongitude = response.geoLongitude
                    self.item.geoLatitude = response.geoLatitude
-                   if (!!response.idGeoZone) {
-                       self.item.idGeoZone = response.idGeoZone
+                   if (self.item.geoLongitude && self.item.geoLatitude)
                        self.setCoordinate()
-                   } else {
-                       modals.create('bs-alert', {
-                           type: 'modal-danger',
-                           title: 'Предупреждение',
-                           text: 'Внимание! Не удаётся определить район замера автоматически!\nУстановите район замера в ручную!',
-                           size: 'modal-sm',
-                           buttons: [
-                               {action: 'ok', title: 'Я понял', style: 'btn-default'},
-                           ],
-                           callback() {
-                               this.modalHide()
-                           }
-                       })
-                   }
-
                    self.update()
                 }
             })
         }
 
-        self.handlers = {
-            getStreets(e) {
-                self.item.addressStreet = e.target.value
-                self.getStreets(self.item.idAddressCity)
-            }
-        }
-
-        self.regionChange = (e) => {
-            self.cities = []
-            self.streets = []
-            self.item.addressArea = null
-            self.item.geoLongitude = null
-            self.item.geoLatitude = null
-            self.item.addressStreet = null
-
-            self.update()
-            self.getCities(e.target.value)
-        }
-
-        self.cityChange = (e) => {
-
-            self.streets = []
-            self.item.addressArea = null
-            self.item.geoLongitude = null
-            self.item.geoLatitude = null
-            self.item.addressStreet = null
-            self.item.idAddressCity = e.target.value
-
-            self.update()
-            self.getStreets(self.item.idAddressCity)
-        }
-
         self.getMeasurementDate = () => {
-            if (!self.item.idAddressCity || !self.item.addressStreet) {
-                modals.create('bs-alert', {
-                    type: 'modal-danger',
-                    title: 'Ошибка',
-                    text: 'Внимание! Не задан адрес замера!\nДля выбора даты замера укажите адрес замера!',
-                    size: 'modal-sm',
-                    buttons: [
-                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
-                    ],
-                    callback() {
-                        this.modalHide()
-                    }
-                })
-                return
-            }
 
             if (!self.item.idGeoZone) {
                 modals.create('bs-alert', {

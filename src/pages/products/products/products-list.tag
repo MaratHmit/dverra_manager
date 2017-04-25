@@ -72,7 +72,7 @@ products-list
                             li(onclick='{ handlers.setFeatures }')
                                 a(href='#')
                                     i.fa.fa-fw
-                                    |  Назначить спецификации
+                                    |  Назначить характеристики
                             li(onclick='{ handlers.setBrand }')
                                 a(href='#')
                                     i.fa.fa-fw

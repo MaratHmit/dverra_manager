@@ -13,7 +13,7 @@ products-list-select-modal
                         dblclick='{ parent.opts.submit.bind(this) }')
                         #{'yield'}(to='body')
                             datatable-cell(name='id') { row.id }
-                            datatable-cell(name='name') { row.name }
+                            datatable-cell(name='name') { row.title }
                             datatable-cell(name='price') { (row.price / 1).toFixed(2) }
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть

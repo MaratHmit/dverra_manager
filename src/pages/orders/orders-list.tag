@@ -45,7 +45,7 @@ orders-list
             datatable-cell(name='customer') { row.customer }
             datatable-cell(name='customerPhone') { row.customerPhone }
             datatable-cell(name='serviceDate') { row.serviceDate }
-            datatable-cell(name='serviceAddress') { row.serviceAddress }
+            datatable-cell(name='serviceAddress') { row.address }
             datatable-cell(name='debt', style='background-color:{ red: row.debt > 0  } ')
                 span { (row.debt / 1).toLocaleString() } ₽
             datatable-cell(name='amount')

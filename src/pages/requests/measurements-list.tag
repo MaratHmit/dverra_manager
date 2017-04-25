@@ -33,11 +33,11 @@ measurements-list
             datatable-cell(name='customer') { row.customer }
             datatable-cell(name='customerPhone') { row.customerPhone }
             datatable-cell(name='serviceDate') { row.serviceDate }
-            datatable-cell(name='serviceAddress') { row.serviceAddress }
+            datatable-cell(name='serviceAddress') { row.address }
             datatable-cell(name='serviceZone') { row.serviceZone }
-            datatable-cell(name='note') { row.note }
             datatable-cell(name='status', class='{ handlers.statuses.colors[row.status]  } ')
                 | { handlers.statuses.text[row.status]  }
+            datatable-cell(name='note') { row.note }
 
     script(type='text/babel').
         var self = this
@@ -98,8 +98,8 @@ measurements-list
             { name: 'serviceDate' , value: 'Дата замера' },
             { name: 'serviceAddress' , value: 'Адрес замера' },
             { name: 'serviceZone' , value: 'Район замера' },
-            { name: 'note' , value: 'Заметка' },
             { name: 'status' , value: 'Статус' },
+            { name: 'note' , value: 'Заметка' },
         ]
 
         self.edit = function (e) {
