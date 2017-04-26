@@ -12,9 +12,8 @@ products-list-select-modal
                         filters='{ parent.categoryFilters }', search='true', reload='true', sortable='true',
                         dblclick='{ parent.opts.submit.bind(this) }')
                         #{'yield'}(to='body')
-                            datatable-cell(name='id') { row.id }
                             datatable-cell(name='name') { row.title }
-                            datatable-cell(name='price') { (row.price / 1).toFixed(2) }
+                            datatable-cell(name='priceReal') { (row.priceReal / 1).toLocaleString() } ₽
         #{'yield'}(to='footer')
             button(onclick='{ modalHide }', type='button', class='btn btn-default btn-embossed') Закрыть
             button(onclick='{ parent.opts.submit.bind(this) }', type='button', class='btn btn-primary btn-embossed') Выбрать
@@ -23,9 +22,8 @@ products-list-select-modal
         var self = this
 
         self.cols = [
-            {name: 'id', value: '#'},
             {name: 'name', value: 'Наименование'},
-            {name: 'price', value: 'Цена'},
+            {name: 'priceReal', value: 'Цена'},
         ]
 
         self.one('updated', () => {

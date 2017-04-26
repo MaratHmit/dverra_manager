@@ -8,7 +8,6 @@ offers-list-select-modal
                     catalog-static(name="offersSelect", cols='{ parent.cols }', rows='{ parent.opts.offers }',
                         remove-toolbar='true', dblclick='{ parent.opts.submit.bind(this) }')
                         #{'yield'}(to='body')
-                            datatable-cell(name='id') { row.id }
                             datatable-cell(name='name') { row.name }
                             datatable-cell(name='price') { (row.priceRetail / 1).toLocaleString() } ₽
         #{'yield'}(to='footer')
@@ -20,7 +19,6 @@ offers-list-select-modal
         var self = this
 
         self.cols = [
-            {name: 'id', value: '#'},
             {name: 'name', value: 'Наименование'},
             {name: 'price', value: 'Цена'}
         ]

@@ -1,5 +1,6 @@
 html {
     width: 100%;
+    font-size: 12px;
     /*overflow-y: scroll;*/
 }
 
@@ -11,6 +12,24 @@ html {
     /*display: flex;*/
     /*align-items: stretch;*/
     /*flex-direction: row;*/
+}
+
+.main {
+    font-family: Arial,sans-serif;
+    font-size: 12px;
+    line-height: 1.2;
+    color: #333;
+    background-color: #fff;
+}
+
+.modal {
+    font-family: Arial,sans-serif;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.main .btn, .main .form-control, .modal .btn, .modal .form-control {
+    border-radius: 0;
 }
 
 .auth-logo {
