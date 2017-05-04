@@ -219,7 +219,6 @@ product-edit
         var self = this
 
         self.item = {}
-        self.currencies = []
         self.seoTags = []
         self.loader = false
         self.error = false
@@ -534,20 +533,7 @@ product-edit
                             callback('error', null)
                         }
                     })
-                }, callback => {
-                    API.request({
-                        object: 'Currency',
-                        method: 'Fetch',
-                        data: {},
-                        success(response) {
-                            self.currencies = response.items
-                            callback(null, 'Currencies')
-                        },
-                        error(response) {
-                            callback('error', null)
-                        }
-                    })
-                }, callback => {
+                },  callback => {
                     API.request({
                         object: 'SeoVariable',
                         method: 'Fetch',
