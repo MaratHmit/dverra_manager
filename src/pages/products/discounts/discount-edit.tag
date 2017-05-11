@@ -40,16 +40,16 @@ discount-edit
                         .col-md-3
                             .form-group
                                 label.control-label Тип значения
-                                select.form-control(name='typeDiscount', value='{ item.typeDiscount }')
-                                    option(value='absolute') Сумма
-                                    option(value='percent') Процент
+                                select.form-control(name='type', value='{ item.type }')
+                                    option(value='0') Сумма
+                                    option(value='1') Процент
                         .col-md-3
                             .form-group
                                 label.control-label Скидка
                                 .input-group
-                                    input.form-control(name='discount', step='0.01', min='0' type='number', value='{ item.discount }')
+                                    input.form-control(name='discount', step='0.01', min='0' type='number', value='{ item.value }')
                                     span.input-group-addon
-                                        | { item.typeDiscount == 'percent' ? '%' : 'р.' }
+                                        | { item.type == 1 ? '%' : 'р.' }
 
                     .row
                         .col-md-12
@@ -65,7 +65,7 @@ discount-edit
                                 .input-group
                                     input.form-control(name='stepDiscount', type='number', step='0.01', value='{ item.stepDiscount }')
                                     span.input-group-addon
-                                        | { item.typeDiscount == 'percent' ? '%' : 'р.' }
+                                        | { item.type == 1 ? '%' : 'р.' }
                         .col-md-6
                             .form-group(if='{ floatingDiscount }')
                                 label.control-label Шаг времени
