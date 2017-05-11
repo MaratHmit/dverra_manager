@@ -19,9 +19,9 @@ product-edit-offers
                     datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='pricePurchase')
                         input(name='pricePurchase', value='{ row.pricePurchase }', type='number')
                     datatable-cell(if='{ !parent.parent.parent.opts.isWarehouse }', name='priceRetail')
-                        input(name='priceRetail', value='{ row.priceRetail }', type='number', onchange='{ handlers.changePrice }')
+                        input(name='priceRetail', value='{ row.price }', type='number', onchange='{ handlers.changePrice }')
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='priceRetail')
-                        input(name='priceRetail', value='{ row.priceRetail }', readonly='true')
+                        input(name='priceRetail', value='{ row.price }', readonly='true')
                     datatable-cell(if='{ parent.parent.parent.opts.isWarehouse }', name='count')
                         input(name='count', value='{ row.count }', readonly='true')
                     datatable-cell(each='{ item, i in parent.parent.parent.newCols }', name='{ item.name }') { row.params[i].value }
