@@ -23,6 +23,7 @@ group-edit
         ul.nav.nav-tabs.m-b-2
             li(if='{ !isMulti }', class='{ active: !isMulti }') #[a(data-toggle='tab', href='#group-edit-home') Основная информация]
             li(if='{ !isMulti }') #[a(data-toggle='tab', href='#group-edit-childs') Подразделы]
+            li(if='{ !isMulti }') #[a(data-toggle='tab', href='#group-edit-products') Товары]
             li(class='{ active: isMulti }') #[a(data-toggle='tab', href='#group-edit-images') Картинки]
             li #[a(data-toggle='tab', href='#group-edit-discounts') Скидки]
             li #[a(data-toggle='tab', href='#group-edit-seo') SEO]
@@ -73,6 +74,12 @@ group-edit
                             datatable-cell(name='id') { row.id }
                             datatable-cell(name='name') { row.name }
                             datatable-cell(name='position') { parseInt(row.position) || 0 }
+                #group-edit-products.tab-pane.fade(show='{ !isMulti }')
+                    catalog-static(name='products', rows='{ item.products }', cols='{ productsCols }', reorder='true')
+                        #{'yield'}(to='body')
+                            datatable-cell(name='id') { row.id }
+                            datatable-cell(name='name') { row.name }
+                            datatable-cell(name='position') { parseInt(row.position) || 0 }
 
                 #group-edit-images.tab-pane.fade(class='{ "in active": isMulti }')
                     product-edit-images(name='images', value='{ item.images }', section='shopgroup')
@@ -112,7 +119,13 @@ group-edit
         self.childsCols = [
             {name: 'id', value: '#'},
             {name: 'name', value: 'Наименование'},
-            {name: 'position', value: 'Индекс'}
+            {name: 'position', value: 'Позиция'}
+        ]
+
+        self.productsCols = [
+            {name: 'id', value: '#'},
+            {name: 'name', value: 'Наименование'},
+            {name: 'position', value: 'Позиция'}
         ]
 
         self.seoTag = new app.insertText()
