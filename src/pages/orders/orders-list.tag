@@ -96,6 +96,7 @@ orders-list
                     submit() {
                         let data = this.item
                         data.idOrder = item.id
+                        data.isPrint = true
 
                         this.modalHide()
                         if (data.amount > 0) {
