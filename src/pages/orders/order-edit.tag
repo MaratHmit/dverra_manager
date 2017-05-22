@@ -14,13 +14,9 @@ order-edit
     virtual(hide='{ loader }')
         .btn-group
             a.btn.btn-default(href='#orders') #[i.fa.fa-chevron-left]
-            button.btn.btn-default(if='{ isNew ? checkPermission("orders", "0100") : checkPermission("orders", "0010") }',
-            onclick='{ submit }', type='button')
-                i.fa.fa-floppy-o
-                |  Сохранить
-            button.btn.btn-default(if='{ !isNew }', onclick='{ reload }', title='Обновить', type='button')
+            button.btn.btn-default(onclick='{ reload }', title='Обновить', type='button')
                 i.fa.fa-refresh
-        .h4 { isNew ? 'Новый заказ' : 'Редактирование заказа № ' + item.num }
+        .h4 { 'Заказ № ' + item.num }
         form(action='', onchange='{ change }', onkeyup='{ change }', method='POST')
             .row
                 .col-md-1
@@ -45,7 +41,7 @@ order-edit
                                 i.fa.fa-list
                             span.input-group-addon(onclick='{ newCustomer }')
                                 i.fa.fa-plus
-                        .help-block { error.idUser }
+                        .help-block
                 .col-md-2
                     .form-group
                         label.control-label Телефон заказчика
@@ -53,33 +49,17 @@ order-edit
             .row
                 .col-md-12
                     .well.well-sm
-                        catalog-static(name='items', rows='{ item.items }', cols='{ itemsCols }',
-                        handlers='{ itemsHandlers }')
-                            #{'yield'}(to='toolbar')
-                                .form-group
-                                    button.btn.btn-primary(type='button', onclick='{ opts.handlers.addItem }')
-                                        i.fa.fa-plus
-                                    button.btn.btn-primary(type='button', onclick='{ opts.handlers.addProducts }')
-                                        |  Справочник товаров
-                                    button.btn.btn-primary(type='button', onclick='{ opts.handlers.addServices }')
-                                        |  Справочник услуг
+                        catalog-static(name='items', rows='{ item.items }', cols='{ itemsCols }')
                             #{'yield'}(to='body')
                                 datatable-cell(name='name')
-                                    span(if='{ row.idService || row.idProduct }') { row.name }
-                                    input(if='{ !row.idService && !row.idProduct }'  value='{ row.name }', type='text',
-                                        onchange='{ handlers.textChange }')
+                                    span { row.name }
                                 datatable-cell(name='count')
-                                    input(value='{ row.count }', type='number', step='1', min='1',
-                                    onchange='{ handlers.numberChange }')
+                                    span { row.count }
                                 datatable-cell(name='price')
-                                    input(value='{ row.price }', type='number', step='1', min='0',
-                                    onchange='{ handlers.numberChange }')
+                                    span { row.price }
                                 datatable-cell(name='discount')
-                                    input(value='{ row.discount }', type='number', step='1', min='0',
-                                    onchange='{ handlers.numberChange }')
+                                    span { row.discount }
                                 datatable-cell(name='sum') { (row.count * row.price - row.discount).toLocaleString() } ₽
-                        .alert.alert-danger(if='{ error.items }')
-                            | { error.items }
 
             .row
                 .col-md-12
@@ -146,33 +126,6 @@ order-edit
         self.sumServices = 0
         self.total = 0
 
-        self.mixin('validation')
-        self.mixin('permissions')
-        self.mixin('change')
-
-        self.rules = () => {
-            let rules = {
-                items: {
-                    required: true,
-                    rules: [{
-                        type: 'minLength[1]',
-                        prompt: 'В списке должно быть не менее одного элемента'
-                    }]
-                },
-            }
-
-            if (self.item && self.item.idUser)
-                return { ...rules }
-            else
-                return { ...rules, idUser: 'empty' }
-        }
-
-        self.afterChange = e => {
-            let name = e.target.name
-            delete self.error[name]
-            self.error = {...self.error, ...self.validation.validate(self.item, self.rules(), name)}
-        }
-
         self.itemsCols = [
             {name: 'name', value: 'Наименование'},
             {name: 'count', value: 'Кол-во'},
@@ -181,188 +134,7 @@ order-edit
             {name: 'amount', value: 'Стоимость'},
         ]
 
-        self.itemsHandlers = {
-            numberChange(e) {
-                this.row[this.opts.name] = e.target.value
-            },
-            textChange(e) {
-                this.row[this.opts.name] = e.target.value
-            },
-            addItem() {
-                self.item.items = self.item.items || []
-                self.item.items.push({count: 1, discount: 0, id: null, price:0, amount:0})
-                self.update()
-                let event = document.createEvent('Event')
-                event.initEvent('change', true, true)
-                self.tags.items.root.dispatchEvent(event)
-            },
-            addProducts() {
-                modals.create('products-list-select-modal', {
-                    type: 'modal-primary',
-                    size: 'modal-lg',
-                    submit() {
-                        let modalProducts = this
-                        let selectedProducts = modalProducts.tags.catalog.tags.datatable.getSelectedRows()                        
-                        self.item.items = self.item.items || []                
-                        if (selectedProducts.length > 0) {
-                            let idsProducts = selectedProducts.map(item => item.id)
-                            let value = idsProducts.join(",")
-                            let params = { filters: { field: 'idProduct', sign: 'IN', value: value } }
-                            API.request({
-                                object: 'Offer',
-                                method: 'Fetch',
-                                data: params,
-                                success(response) {
-                                    if (response.items.length) {
-                                        modals.create('offers-list-select-modal', {
-                                            type: 'modal-primary',
-                                            size: 'modal-lg',
-                                            offers: response.items,
-                                            submit() {
-                                                let modalOffers = this
-                                                let items = this.tags.offersSelect.tags.datatable.getSelectedRows()
-                                                items.forEach(item => {
-                                                    item.idProduct = item.idProduct
-                                                    item.idOffer = item.id
-                                                    item.price = item.priceRetail
-                                                    item.id = null
-                                                    self.item.items.push({...item, count: 1, discount: 0 })
-                                                })
-                                                self.update()
-                                                modalProducts.modalHide()
-                                                modalOffers.modalHide()
-                                                let event = document.createEvent('Event')
-                                                event.initEvent('change', true, true)
-                                                self.tags.items.root.dispatchEvent(event)
-                                            }
-                                        })
-                                    } else {
-                                          selectedProducts.forEach(item => {
-                                            item.idProduct = item.id
-                                            item.id = null
-                                            self.item.items.push({...item, count: 1, discount: 0 })
-                                            self.update()
-                                            modalProducts.modalHide()
-                                            let event = document.createEvent('Event')
-                                            event.initEvent('change', true, true)
-                                            self.tags.items.root.dispatchEvent(event)
-                                        })
-                                    }
-                                },
-                                complete() {
-                                    self.update()
-                                    modalProducts.modalHide()
-                                }
-                            })
-                        }
-                    }
-                })
-            },
-            addServices() {
-                modals.create('shop-services-list-select-modal', {
-                    type: 'modal-primary',
-                    size: 'modal-lg',
-                    submit() {
-                        let _this = this
-                        let items = _this.tags.catalog.tags.datatable.getSelectedRows()
-                        self.item.items = self.item.items || []
-                        if (items.length > 0) {
-                            let ids = self.item.items.map(item => item.id)
-                            items.forEach(item => {
-                            if (ids.indexOf(item.id) === -1)
-                                self.item.items.push({...item, count: 1, discount: 0, id: null, idService: item.id})
-                           })
-                            self.update()
-                            _this.modalHide()
-                            let event = document.createEvent('Event')
-                            event.initEvent('change', true, true)
-                            self.tags.items.root.dispatchEvent(event)
-                        }
-                    }
-                })
-            }
-        }
-
         self.statuses = []
-
-        self.changeCustomer = () => {
-            modals.create('persons-list-select-modal',{
-                type: 'modal-primary',
-                size: 'modal-lg',
-                submit() {
-                    let items = this.tags.catalog.tags.datatable.getSelectedRows()
-                    if (items.length > 0) {
-                        self.item.idUser = items[0].id
-                        self.item.customer = items[0].name
-                        self.item.customerPhone = items[0].phone
-                        self.update()
-                        this.modalHide()
-                    }
-                }
-            })
-        }
-
-        self.newCustomer = () => {
-            modals.create('person-new-modal', {
-                type: 'modal-primary',
-                submit() {
-                    var _this = this
-                    var params = { name: _this.name.value, phone: _this.phone.value, email: _this.email.value }
-                    API.request({
-                        object: 'User',
-                        method: 'Save',
-                        data: params,
-                        success(response) {
-                            popups.create({title: 'Успех!', text: 'Контакт добавлен!', style: 'popup-success'})
-                            _this.modalHide()
-                            self.item.idUser = response.id
-                            self.item.customer = response.name
-                            self.item.customerPhone = response.phone
-                            self.update()
-                            if (response.isExist) {
-                                modals.create('bs-alert', {
-                                    type: 'modal-danger',
-                                    title: 'Предупреждение',
-                                    text: 'Внимание! Контакт с указанным новером уже существует!\nБудет взят контакт из справочника!',
-                                    size: 'modal-sm',
-                                    buttons: [
-                                        {action: 'ok', title: 'Я понял', style: 'btn-default'},
-                                    ],
-                                    callback() {
-                                        this.modalHide()
-                                        _this.modalHide()
-                                    }
-                                })
-                            }
-                        }
-                    })
-                }
-            })
-            $('.phone-mask').mask("+7 (999) 999-99-99",{ "placeholder": " " })
-        }
-
-
-        self.submit = e => {
-            var params = self.item
-            self.error = self.validation.validate(self.item, self.rules())
-
-            if (!self.error) {
-                API.request({
-                    object: 'Order',
-                    method: 'Save',
-                    data: params,
-                    success(response) {
-                        self.item = response
-                        self.isNew = false
-                        self.update()
-                        if (self.isNew)
-                            riot.route(`/orders/${self.item.id}`)
-                        popups.create({title: 'Успех!', text: 'Заказ сохранен!', style: 'popup-success'})
-                        observable.trigger('orders-reload')
-                    }
-                })
-            }
-        }
 
         self.reload = e => {
             observable.trigger('orders-edit', self.item.id)
@@ -440,26 +212,6 @@ order-edit
                }
             })
         }
-
-        observable.on('order-new', () => {
-            self.error = false
-            self.isNew = true
-            self.item = {sumDelivery: 0, discount: 0, idStatus: 2}
-            self.item.dateDisplay = (new Date()).toLocaleString()
-
-            API.request({
-                object: 'Order',
-                method: 'Info',
-                success(response) {
-                    self.item.num = response.newNum
-                    self.setCoordinate()
-                    if (mapYandexOrder)
-                        mapYandexOrder.setCenter([55.76, 37.64], 10);
-                    self.update()
-                    self.getZones()
-                }
-            })
-        })
 
         observable.on('orders-edit', id => {
             var params = {id}
