@@ -79,7 +79,6 @@ group-edit
                         #{'yield'}(to='body')
                             datatable-cell(name='id') { row.id }
                             datatable-cell(name='name') { row.name }
-                            datatable-cell(name='position') { parseInt(row.position) || 0 }
 
                 #group-edit-images.tab-pane.fade(class='{ "in active": isMulti }')
                     product-edit-images(name='images', value='{ item.images }', section='shopgroup')
@@ -125,7 +124,6 @@ group-edit
         self.productsCols = [
             {name: 'id', value: '#'},
             {name: 'name', value: 'Наименование'},
-            {name: 'position', value: 'Позиция'}
         ]
 
         self.seoTag = new app.insertText()
@@ -300,6 +298,24 @@ group-edit
                     method: 'Sort',
                     data: params,
                     notFoundRedirect: false
+                })
+
+                self.update()
+            })
+            self.tags.products.tags.datatable.on('reorder-end', (newIndex, oldIndex) => {
+                let {current, limit} = self.tags.products.pages
+                let params = { indexes: [] }
+                let offset = current > 0 ? (current - 1) * limit : 0
+
+                self.tags.products.value.splice(offset + newIndex, 0, self.tags.products.value.splice(offset + oldIndex, 1)[0])
+                var temp = self.tags.products.value
+                self.rows = []
+                self.update()
+                self.tags.products.value = temp
+
+                self.tags.products.items.forEach((item, sort) => {
+                    item.sort = sort + offset
+                    params.indexes.push({id: item.id, sort: sort + offset})
                 })
 
                 self.update()
