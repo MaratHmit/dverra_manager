@@ -143,7 +143,8 @@ discount-edit
                             cols='{ cols }', rows='{ item.listProducts }')
                                 #{'yield'}(to='body')
                                     datatable-cell(name='id') { row.id }
-                                    datatable-cell(name='name') { row.name }
+                                    datatable-cell(name='name') { row.title }
+                                    datatable-cell(name='price') { row.priceRetail }
                 #discount-edit-persons.tab-pane.fade
                     .row
                         .col-md-12
@@ -177,6 +178,7 @@ discount-edit
         self.cols = [
             {name: 'id', value: '#'},
             {name: 'name', value: 'Наименование'},
+            {name: 'price', value: 'Цена'},
         ]
 
         self.submit = () => {
